@@ -1,0 +1,66 @@
+<?php
+    /**
+     * @Author : Anton Zinovyev
+     */
+
+    namespace Vxn\Core;
+
+    final class Engine
+    {
+        private static $inited;
+
+        private static $shutdowns            = [];
+        private static $shutdownsNonblocking = [];
+
+        public static function Init() :void
+        {
+            if (self::$inited) {
+                return;
+            }
+
+            self::$inited = true;
+
+            if (version_compare(PHP_VERSION, '7.1.0') < 0) {
+                throw new \Exception("Required PHP 7.1.0 or newer!");
+            }
+
+            date_default_timezone_set('UTC');
+
+            register_shutdown_function(function () {
+                foreach (self::$shutdowns as $cb) {
+                    $cb();
+                }
+
+                if (self::$shutdownsNonblocking) {
+                    if (PHP_SAPI == 'fpm-fcgi' && function_exists('fastcgi_finish_request')) {
+                        fastcgi_finish_request();
+                    }
+                    else {
+                        flush();
+                        while (ob_get_level()) {
+                            ob_end_flush();
+                        }
+                    }
+
+                    foreach (self::$shutdownsNonblocking as $cb) {
+                        $cb();
+                    }
+                }
+            });
+        }
+
+        public static function RegisterShutdown(callable $callback) :void
+        {
+            self::$shutdowns[] = $callback;
+        }
+
+        public static function RegisterDelayedShutdown(callable $callback) :void
+        {
+            self::$shutdownsNonblocking[] = $callback;
+        }
+
+        public static function IsCLI() :bool
+        {
+            return PHP_SAPI == 'cli';
+        }
+    }
