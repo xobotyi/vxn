@@ -6,7 +6,7 @@
     namespace Vxn\Helper;
 
 
-    class Cast
+    final class Cast
     {
         public static function ToArray($var) :array
         {

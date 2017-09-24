@@ -5,7 +5,7 @@
 
     namespace Vxn\Helper;
 
-    class Str
+    final class Str
     {
         public static function PathFormat(string $path) :string
         {

@@ -5,7 +5,7 @@
 
     namespace Vxn\Helper;
 
-    class Arr
+    final class Arr
     {
         public static function Check($key, $array) :bool
         {

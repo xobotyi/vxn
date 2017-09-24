@@ -5,6 +5,6 @@
 
     namespace Vxn\Helper;
 
-    class Curl
+    final class Curl
     {
     }
