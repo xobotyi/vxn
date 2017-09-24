@@ -38,6 +38,10 @@
                 $scope = &$scope[$nodeName];
             }
 
+            if ($lastKey === '*') {
+                return (bool)count($scope);
+            }
+
             return isset($scope[stripslashes($lastKey)]) || array_key_exists(stripslashes($lastKey), $scope);
         }
 
@@ -86,7 +90,63 @@
                 $scope = &$scope[$trueNodeName];
             }
 
+            if ($lastKey === '*') {
+                return $scope;
+            }
+
             return $scope[stripslashes($lastKey)] ?? $default;
+        }
+
+        public static function Set($key, &$array, $value) :bool
+        {
+            if (!is_array($array)) {
+                return false;
+            }
+            else if ($key === null || $key === false || $key === '') {
+                return false;
+            }
+
+            $path = preg_split("~(?<!\\\\)\.~", $key);
+
+            if (!isset($path[1])) {
+                $array[stripslashes($path[0])] = $value;
+
+                return true;
+            }
+
+            $lastKey = array_pop($path);
+            $scope   = &$array;
+
+            while (!is_null($nodeName = array_shift($path))) {
+                $trueNodeName = stripslashes($nodeName);
+
+                if ($nodeName === '*') {
+                    $restPart = implode('.', $path);
+                    $restPart .= ($restPart ? '.' : '') . $lastKey;
+
+                    foreach ($scope as &$item) {
+                        self::Set($restPart, $scope, $value);
+                    }
+
+                    return true;
+                }
+                else if (isset($scope[$trueNodeName]) && !is_array($scope[$trueNodeName])) {
+                    return false;
+                }
+
+                $scope = &$scope[$trueNodeName];
+            }
+
+            if ($lastKey === '*') {
+                foreach ($scope as &$item) {
+                    $item = $value;
+                }
+            }
+            else {
+                $scope[stripslashes($lastKey)] = $value;
+            }
+
+            return true;
         }
 
         public static function RemoveValue($value, &$array) :void

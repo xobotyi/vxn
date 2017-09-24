@@ -5,6 +5,8 @@
 
     namespace Vxn\Core;
 
+    use Vxn\Http\Request;
+
     final class Log
     {
         public const LEVEL_WARNING   = 'WARNING';
@@ -31,6 +33,6 @@
 
         public static function Format(string $message, string $category = 'general', string $level = self::LEVEL_INFO) :string
         {
-            return date('Y-m-d H:i:s') . " [{$level}] [{$category}] " . rtrim($message) . "\n";
+            return date('Y-m-d H:i:s') . "[" . Request::UserIp() . "] [{$level}] [{$category}] " . rtrim($message) . "\n";
         }
     }
