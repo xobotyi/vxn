@@ -5,6 +5,7 @@
 
     namespace Vxn\Core;
 
+    use Vxn\Helper\Str;
     use Vxn\Http\Request;
 
     final class Log
@@ -23,12 +24,12 @@
 
             FS::MkDir($path);
 
-            return FS::Write(FS::PathJoin($path, "{$logName}.log"), self::Format($message, $category, $level), true);
+            return FS::Write(Str::PathJoin($path, "{$logName}.log"), self::Format($message, $category, $level), true);
         }
 
         public static function Clear(string $logName) :bool
         {
-            return FS::Delete(FS::PathJoin(Cfg::Get('App.path.log', Autoloader::GetAutoloaderPath(VXN_RESERVED_NAMESPACE) . '/Log'), "{$logName}.log"));
+            return FS::Delete(Str::PathJoin(Cfg::Get('App.path.log', Autoloader::GetAutoloaderPath(VXN_RESERVED_NAMESPACE) . '/Log'), "{$logName}.log"));
         }
 
         public static function Format(string $message, string $category = 'general', string $level = self::LEVEL_INFO) :string

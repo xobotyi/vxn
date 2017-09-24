@@ -5,6 +5,8 @@
 
     namespace Vxn\Core;
 
+    use Vxn\Helper\Str;
+
     final class FS
     {
         public static function Read(string $fPath) :string
@@ -79,11 +81,11 @@
                 $dirListing = self::ListDir($path);
 
                 foreach ($dirListing['files'] as &$fPath) {
-                    self::Delete(self::PathJoin($path, $fPath));
+                    self::Delete(Str::PathJoin($path, $fPath));
                 }
 
                 foreach ($dirListing['directories'] as &$dPath) {
-                    self::RmDir(self::PathJoin($path, $dPath), false);
+                    self::RmDir(Str::PathJoin($path, $dPath), false);
                 }
             }
 
@@ -163,10 +165,5 @@
             else {
                 return $returnResult ? include $fPath : (bool)include $fPath;
             }
-        }
-
-        public static function PathJoin(...$args) :string
-        {
-            return implode($args, DIRECTORY_SEPARATOR);
         }
     }
