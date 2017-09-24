@@ -4,6 +4,3 @@
      */
 
     include_once __DIR__ . '/vxn.init.php';
-
-    var_dump(\Vxn\Http\Request::Uri());
-    //    var_dump(\Vxn\Http\Request::Server());
