@@ -6,6 +6,7 @@
     namespace Vxn\Storage;
 
     use Vxn\Core\Cfg;
+    use Vxn\Core\Engine;
     use Vxn\Core\Log;
 
     final class Psql
@@ -53,17 +54,22 @@
             self::$connection = pg_connect("host={$host} port={$port} dbname={$dbname} user={$user} password={$pass} options='--client_encoding={$encoding}'");
 
             if (!self::$connection) {
-                Log::Write('db',
+                Log::Write('error',
                            "Unable to connect to PostgreSQL database." .
                            "\n\tConnection string: [host={$host} port={$port} dbname={$dbname} user={$user} password={$pass} options='--client_encoding={$encoding}']",
                            'PostgreSQL',
                            Log::LEVEL_EMERGENCY);
                 throw new \Exception('Unable to connect to PostgreSQL database');
             }
+
+            Engine::RegisterFinalShutdown(function () {
+                self::CloseConnection();
+            });
         }
 
         /**
          * @return resource
+         * @throws \Exception
          */
         public static function GetConnection()
         {
@@ -120,6 +126,7 @@
          * @param string $query
          *
          * @return bool|resource
+         * @throws \Exception
          */
         public static function Query(string $query)
         {
@@ -148,6 +155,7 @@
          * @param string $query
          *
          * @return bool|resource
+         * @throws \Exception
          */
         public static function QueryAsync(string $query)
         {

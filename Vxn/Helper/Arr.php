@@ -28,7 +28,7 @@
             $lastKey = array_pop($path);
             $scope   = &$array;
 
-            while (!is_null($nodeName = array_shift($path))) {
+            foreach ($path as $nodeName) {
                 $nodeName = stripslashes($nodeName);
 
                 if (!isset($scope[$nodeName]) || !is_array($scope[$nodeName])) {
@@ -66,24 +66,23 @@
             $lastKey = array_pop($path);
             $scope   = &$array;
 
-            while (!is_null($nodeName = array_shift($path))) {
+            foreach ($path as $nodeName) {
                 $trueNodeName = stripslashes($nodeName);
 
                 if ($nodeName === '*') {
                     $result = [];
 
-                    $restPart = implode('.', $path);
-                    $restPart .= ($restPart ? '.' : '') . $lastKey;
+                    $restPart = implode('.', $path) . ($path ? '.' : '') . $lastKey;
 
                     foreach ($scope as &$item) {
                         if (($val = self::Get($restPart, $item)) !== null) {
-                            $result[] = $val;
+                            $result[] = &$val;
                         }
                     }
 
                     return $result ?: $default;
                 }
-                else if (!isset($scope[$trueNodeName]) || !is_array($scope[$trueNodeName])) {
+                else if (!is_array($scope[$trueNodeName] ?? null)) {
                     return $default;
                 }
 
@@ -117,7 +116,7 @@
             $lastKey = array_pop($path);
             $scope   = &$array;
 
-            while (!is_null($nodeName = array_shift($path))) {
+            foreach ($path as $nodeName) {
                 $trueNodeName = stripslashes($nodeName);
 
                 if ($nodeName === '*') {
@@ -125,7 +124,7 @@
                     $restPart .= ($restPart ? '.' : '') . $lastKey;
 
                     foreach ($scope as &$item) {
-                        self::Set($restPart, $scope, $value);
+                        self::Set($restPart, $item, $value);
                     }
 
                     return true;

@@ -9,8 +9,9 @@
     {
         private static $inited;
 
-        private static $shutdowns            = [];
-        private static $shutdownsNonblocking = [];
+        private static $shutdowns        = [];
+        private static $shutdownsDelayed = [];
+        private static $shutdownsFinal   = [];
 
         public static function Init() :void
         {
@@ -31,7 +32,7 @@
                     $cb();
                 }
 
-                if (self::$shutdownsNonblocking) {
+                if (self::$shutdownsDelayed) {
                     if (PHP_SAPI == 'fpm-fcgi' && function_exists('fastcgi_finish_request')) {
                         fastcgi_finish_request();
                     }
@@ -42,7 +43,13 @@
                         }
                     }
 
-                    foreach (self::$shutdownsNonblocking as $cb) {
+                    foreach (self::$shutdownsDelayed as $cb) {
+                        $cb();
+                    }
+                }
+
+                if (self::$shutdownsFinal) {
+                    foreach (self::$shutdownsFinal as $cb) {
                         $cb();
                     }
                 }
@@ -56,7 +63,12 @@
 
         public static function RegisterDelayedShutdown(callable $callback) :void
         {
-            self::$shutdownsNonblocking[] = $callback;
+            self::$shutdownsDelayed[] = $callback;
+        }
+
+        public static function RegisterFinalShutdown(callable $callback) :void
+        {
+            self::$shutdownsFinal[] = $callback;
         }
 
         public static function IsCLI() :bool
