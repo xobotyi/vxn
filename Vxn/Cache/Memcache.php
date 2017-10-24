@@ -9,19 +9,111 @@
     use Vxn\Core\Engine;
     use Vxn\Core\Log;
 
+    /**
+     * Class Memcache
+     *
+     * @package Vxn\Cache
+     */
     class Memcache
     {
-        private static $inited;
+        /**
+         * @var array
+         */
+        private static $tagsBuffer = [];
+
+        /**
+         * @param string $tag
+         *
+         * @return int|null
+         * @throws \Exception
+         * @throws \TypeError
+         */
+        public static function tagGetVer(string $tag) :?int
+        {
+            if (!self::$useTagsBuffer || !($ver = (self::$tagsBuffer[$tag] ?? null))) {
+                $ver = self::$tagsBuffer[$tag] = self::GetInstance()
+                                                     ->get("\$vxnTag:{$tag}") ?: self::tagIncrementVer($tag);
+            }
+
+            return $ver ?: null;
+        }
+
+        /**
+         * @param $tag
+         *
+         * @return bool|int|mixed
+         * @throws \Exception
+         * @throws \TypeError
+         */
+        public static function tagIncrementVer($tag)
+        {
+            if (!$tag) {
+                return false;
+            }
+
+            $time = microtime(true) * 10000;
+
+            if (is_array($tag)) {
+                foreach ($tag as $tagName) {
+                    self::GetInstance()->set("\$vxnTag:{$tagName}", $time, null, self::$ttlTags);
+                    if (self::$useTagsBuffer) {
+                        self::$tagsBuffer[$tagName] = $time;
+                    }
+                }
+
+                return true;
+            }
+            else if (is_string($tag) || is_numeric($tag)) {
+                self::GetInstance()->set("\$vxnTag:{$tag}", $time, null, self::$ttlTags);
+                if (self::$useTagsBuffer) {
+                    self::$tagsBuffer[$tag] = $time;
+                }
+
+                return $time;
+            }
+
+            throw new \TypeError("'\$tag' expected to be an array, string or numeric, got " . gettype($tag));
+        }
+
+        /**
+         * @var bool
+         */
+        private static $inited = false;
+
+        /**
+         * @var bool
+         */
+        private static $useTagsBuffer = true;
 
         /**
          * @var \Memcache
          */
         private static $instance;
-        private static $ttlDefault = 60;
-        private static $ttlMax     = 2592000;
-        private static $ttlTags    = 604800;
 
-        public static function Init(?string $host = null, ?int $port = null, ?int $ttlDefault = null, ?int $ttlMax = null) :void
+        /**
+         * @var int
+         */
+        private static $ttlDefault = 60;
+        /**
+         * @var int
+         */
+        private static $ttlMax = 2592000;
+        /**
+         * @var int
+         */
+        private static $ttlTags = 604800;
+
+        /**
+         * @param null|string $host
+         * @param int|null    $port
+         * @param int|null    $ttlDefault
+         * @param int|null    $ttlMax
+         * @param int|null    $ttlTags
+         * @param bool|null   $useTagsBuffer
+         *
+         * @throws \Exception
+         */
+        public static function Init(?string $host = null, ?int $port = null, ?int $ttlDefault = null, ?int $ttlMax = null, ?int $ttlTags = null, ?bool $useTagsBuffer = null) :void
         {
             if (!self::IsSupported()) {
                 throw new \Exception('Memcache is not supported!');
@@ -33,10 +125,13 @@
 
             self::$inited = true;
 
-            $host             = $host ?: Cfg::Get('Vxn.cache.memcache.host');
-            $port             = $port ?: Cfg::Get('Vxn.cache.memcache.port');
-            self::$ttlDefault = $ttlDefault ?: Cfg::Get('Vxn.cache.memcache.ttl.default');
-            self::$ttlMax     = $ttlMax ?: Cfg::Get('Vxn.cache.memcache.ttl.max');
+            $host = $host ?: Cfg::Get('Vxn.cache.memcache.host');
+            $port = $port ?: Cfg::Get('Vxn.cache.memcache.port');
+
+            self::$ttlDefault    = $ttlDefault ?: Cfg::Get('Vxn.cache.memcache.ttl.default');
+            self::$ttlMax        = $ttlMax ?: Cfg::Get('Vxn.cache.memcache.ttl.max');
+            self::$ttlTags       = $ttlTags ?: Cfg::Get('Vxn.cache.memcache.ttl.tags');
+            self::$useTagsBuffer = $useTagsBuffer ?: Cfg::Get('Vxn.cache.memcache.useTagsBuffer');
 
             self::$instance = new \Memcache();
 
@@ -53,16 +148,31 @@
             });
         }
 
+        /**
+         * @return bool
+         */
         public static function IsSupported() :bool
         {
             return class_exists('Memcache');
         }
 
+        /**
+         * @return bool
+         */
         public static function CloseConnection() :bool
         {
-            return self::$instance ? self::$instance->close() : true;
+            if (self::$instance) {
+                self::$instance->close();
+                self::$instance = null;
+            }
+
+            return true;
         }
 
+        /**
+         * @return \Memcache|null
+         * @throws \Exception
+         */
         public static function GetInstance() :?\Memcache
         {
             self::Init();
@@ -70,38 +180,25 @@
             return self::$instance;
         }
 
+        /**
+         * @return bool
+         * @throws \Exception
+         */
         public static function Flush() :bool
         {
             return self::GetInstance()->flush();
         }
 
-        public static function tagGetVer($tag) :?int
-        {
-            return self::GetInstance()->get("\$vxnTag:{$tag}") ?: self::tagIncrementVer($tag);
-        }
-
-        public static function tagIncrementVer($tag)
-        {
-            if (!$tag) {
-                return;
-            }
-
-            $time = microtime(true) * 10000;
-
-            if (is_array($tag)) {
-                foreach ($tag as $tagName) {
-                    self::GetInstance()->set("\$vxnTag:{$tagName}", $time, null, self::$ttlTags);
-                }
-            }
-            else if (is_string($tag) || is_numeric($tag)) {
-                self::GetInstance()->set("\$vxnTag:{$tag}", $time, null, self::$ttlTags);
-
-                return $time;
-            }
-
-            throw new \TypeError("'\$tag' expected to be an array, string or numeric, got " . gettype($tag));
-        }
-
+        /**
+         * @param string   $key
+         * @param          $data
+         * @param int|null $ttl
+         * @param array    $tags
+         *
+         * @return bool
+         * @throws \Exception
+         * @throws \TypeError
+         */
         public static function set(string $key, $data, ?int $ttl = null, array $tags = []) :bool
         {
             if ($tags) {
@@ -126,6 +223,16 @@
                                             $expire);
         }
 
+        /**
+         * @param string   $key
+         * @param          $data
+         * @param int|null $ttl
+         * @param array    $tags
+         *
+         * @return bool
+         * @throws \Exception
+         * @throws \TypeError
+         */
         public static function add(string $key, $data, ?int $ttl = null, array $tags = []) :bool
         {
             if ($tags) {
@@ -150,6 +257,16 @@
                                             $expire);
         }
 
+        /**
+         * @param string   $key
+         * @param          $data
+         * @param int|null $ttl
+         * @param array    $tags
+         *
+         * @return bool
+         * @throws \Exception
+         * @throws \TypeError
+         */
         public static function replace(string $key, $data, ?int $ttl = null, array $tags = []) :bool
         {
             if ($tags) {
@@ -174,6 +291,13 @@
                                                 $expire);
         }
 
+        /**
+         * @param $key
+         *
+         * @return bool
+         * @throws \Exception
+         * @throws \TypeError
+         */
         public static function prolong($key) :bool
         {
             if (($cacheValue = self::GetInstance()->get("\$vxnKey:{$key}")) === false) {
@@ -205,6 +329,13 @@
                                             $cacheValue['$_expire']);
         }
 
+        /**
+         * @param $key
+         *
+         * @return bool
+         * @throws \Exception
+         * @throws \TypeError
+         */
         public static function delete($key)
         {
             if (is_array($key)) {
@@ -221,6 +352,14 @@
             throw new \TypeError("'\$key' expected to be an array, string or numeric, got " . gettype($key));
         }
 
+        /**
+         * @param string $key
+         * @param bool   $default
+         *
+         * @return bool
+         * @throws \Exception
+         * @throws \TypeError
+         */
         public static function get(string $key, $default = false)
         {
             if (($cacheValue = self::GetInstance()->get("\$vxnKey:{$key}")) === false) {
@@ -238,6 +377,12 @@
             return $cacheValue['$_data'];
         }
 
+        /**
+         * @param string $key
+         *
+         * @return bool
+         * @throws \Exception
+         */
         public static function expire(string $key)
         {
             if (($cacheValue = self::GetInstance()->get("\$vxnKey:{$key}")) === false) {
@@ -247,6 +392,15 @@
             return $cacheValue['$_expire'];
         }
 
+        /**
+         * @param string $key
+         * @param int    $amount
+         * @param bool   $prolong
+         *
+         * @return bool
+         * @throws \Exception
+         * @throws \TypeError
+         */
         public static function increment(string $key, int $amount = 1, bool $prolong = true) :bool
         {
             if (($cacheValue = self::GetInstance()->get("\$vxnKey:{$key}")) === false) {
@@ -274,6 +428,15 @@
                                             $cacheValue['$_expire']);
         }
 
+        /**
+         * @param string $key
+         * @param int    $amount
+         * @param bool   $prolong
+         *
+         * @return bool
+         * @throws \Exception
+         * @throws \TypeError
+         */
         public static function decrement(string $key, int $amount = 1, bool $prolong = true)
         {
             if (($cacheValue = self::GetInstance()->get("\$vxnKey:{$key}")) === false) {
@@ -301,6 +464,17 @@
                                             $cacheValue['$_expire']);
         }
 
+        /**
+         * @param string   $key
+         * @param callable $callback
+         * @param int|null $ttl
+         * @param array    $tags
+         * @param bool     $prolong
+         *
+         * @return bool|null
+         * @throws \Exception
+         * @throws \TypeError
+         */
         public static function fill(string $key, callable $callback, ?int $ttl = null, array $tags = [], bool $prolong = false)
         {
             if (($data = self::get($key)) !== false) {
