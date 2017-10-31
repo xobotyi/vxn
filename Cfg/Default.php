@@ -8,6 +8,16 @@
     $cfg['App']['host']  = gethostname();
     $cfg['App']['debug'] = true;
 
+    $cfg['App']['path']['base']  = realpath(__DIR__ . '/../');
+    $cfg['App']['path']['cfg']   = $cfg['App']['path']['base'] . '/Cfg';
+    $cfg['App']['path']['log']   = $cfg['App']['path']['base'] . '/log';
+    $cfg['App']['path']['cache'] = $cfg['App']['path']['base'] . '/cache';
+    $cfg['App']['path']['tmp']   = $cfg['App']['path']['base'] . '/tmp';
+
+    $cfg['App']['path']['app']      = $cfg['App']['path']['base'] . '/App';
+    $cfg['App']['path']['i18n']     = $cfg['App']['path']['app'] . '/I18n';
+    $cfg['App']['path']['template'] = $cfg['App']['path']['app'] . '/Template';
+
     // DATABASES
     $cfg['Vxn']['storage']['postgres']['host']     = '127.0.0.1';
     $cfg['Vxn']['storage']['postgres']['port']     = 5432;
