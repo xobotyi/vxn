@@ -33,27 +33,6 @@
             }
         }
 
-        public static function AddHeader(string $name, string $value, bool $replace = true) :void
-        {
-            if ($replace) {
-                self::$headers[] = ['name' => $name, 'value' => $value, 'replace' => $replace];
-            }
-        }
-
-        public static function ApplyHeaders() :void
-        {
-            foreach (self::$headers as $header) {
-                header("{$header['name']}: {$header['value']}", $header['replace']);
-            }
-        }
-
-        public static function AddNoCacheHeaders() :void
-        {
-            self::AddHeader('Cache-Control', 'no-cache,no-store,max-age=0,must-revalidate');
-            self::AddHeader('Expires', date('r', time() - 3600));
-            self::AddHeader('Pragma', 'no-cache');
-        }
-
         public static function RemoveGetParameter(array $names = [], bool $immediately = false) :void
         {
             if (!$names || !($query = Request::Get())) {
@@ -74,11 +53,6 @@
             }
         }
 
-        public static function SetContentType($type)
-        {
-            self::AddHeader('Content-Type', $type . '; charset=UTF-8');
-        }
-
         public static function Redirect(string $uri = '/', bool $immediately = false) :void
         {
             self::AddNoCacheHeaders();
@@ -89,6 +63,32 @@
                 self::ApplyHeaders();
                 exit();
             }
+        }
+
+        public static function AddNoCacheHeaders() :void
+        {
+            self::AddHeader('Cache-Control', 'no-cache,no-store,max-age=0,must-revalidate');
+            self::AddHeader('Expires', date('r', time() - 3600));
+            self::AddHeader('Pragma', 'no-cache');
+        }
+
+        public static function AddHeader(string $name, string $value, bool $replace = true) :void
+        {
+            if ($replace) {
+                self::$headers[] = ['name' => $name, 'value' => $value, 'replace' => $replace];
+            }
+        }
+
+        public static function ApplyHeaders() :void
+        {
+            foreach (self::$headers as $header) {
+                header("{$header['name']}: {$header['value']}", $header['replace']);
+            }
+        }
+
+        public static function SetContentType($type)
+        {
+            self::AddHeader('Content-Type', $type . '; charset=UTF-8');
         }
 
         public static function RedirectPermanently(string $uri = '/', bool $immediately = false) :void

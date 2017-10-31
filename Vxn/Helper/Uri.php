@@ -23,7 +23,8 @@
         public function __construct(string $string)
         {
             $matches = [];
-            preg_match('/^(([^:\/\?#]+):)?(\/\/((([^\/\?#]*)@)?([^\/\?#:]*)(:([^\/\?#]*))?))?([^\?#]*)(\?([^#]*))?(#(.*))?/i', $string, $matches);
+            preg_match('/^(([^:\/\?#]+):)?(\/\/((([^\/\?#]*)@)?([^\/\?#:]*)(:([^\/\?#]*))?))?([^\?#]*)(\?([^#]*))?(#(.*))?/i', $string,
+                       $matches);
 
             $this->_all               = Arr::Get(0, $matches);
             $this->_scheme            = Arr::Get(2, $matches);

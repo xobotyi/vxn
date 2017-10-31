@@ -1,6 +1,7 @@
 <?php
 
     namespace Vxn\Dictionary\ISO;
+
     use Vxn\Helper\Arr;
 
     final class LanguageCodes

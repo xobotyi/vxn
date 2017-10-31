@@ -10,6 +10,13 @@
         private static $inited;
         private static $osName;
 
+        public static function GetOS()
+        {
+            self::Init();
+
+            return self::$osName;
+        }
+
         private static function Init()
         {
             if (self::$inited) {
@@ -19,13 +26,6 @@
             self::$inited = true;
 
             self::$osName = substr(php_uname(), 0, strpos(php_uname(), ' '));
-        }
-
-        public static function GetOS()
-        {
-            self::Init();
-
-            return self::$osName;
         }
 
         public static function Exec($cmd, bool $inBackground = false)

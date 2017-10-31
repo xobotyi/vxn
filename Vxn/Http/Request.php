@@ -34,6 +34,13 @@
 
         private static $inited;
 
+        public static function SafeGet(?string $name = null, $default = null, bool $caseInsensitive = false, bool $raw = false)
+        {
+            self::Init();
+
+            return strip_tags(self::Get($name, $default, $caseInsensitive, $raw));
+        }
+
         private static function Init()
         {
             if (self::$inited) {
@@ -123,6 +130,20 @@
             }
         }
 
+        public static function IsPostMethod() :bool
+        {
+            self::Init();
+
+            return self::GetRequestMethod() === 'POST';
+        }
+
+        public static function GetRequestMethod() :string
+        {
+            self::Init();
+
+            return strtoupper(self::$dataEncoded['server']['REQUEST_METHOD'] ?? 'GET');
+        }
+
         public static function Get(?string $name = null, $default = null, bool $caseInsensitive = false, bool $raw = false)
         {
             self::Init();
@@ -135,11 +156,11 @@
             }
         }
 
-        public static function SafeGet(?string $name = null, $default = null, bool $caseInsensitive = false, bool $raw = false)
+        public static function SafePost(?string $name = null, $default = null, bool $caseInsensitive = false, bool $raw = false)
         {
             self::Init();
 
-            return strip_tags(self::Get($name, $default, $caseInsensitive, $raw));
+            return strip_tags(self::Post($name, $default, $caseInsensitive, $raw));
         }
 
         public static function Post(?string $name = null, $default = null, bool $caseInsensitive = false, bool $raw = false)
@@ -154,11 +175,11 @@
             }
         }
 
-        public static function SafePost(?string $name = null, $default = null, bool $caseInsensitive = false, bool $raw = false)
+        public static function SafeRequest(?string $name = null, $default = null, bool $caseInsensitive = false, bool $raw = false)
         {
             self::Init();
 
-            return strip_tags(self::Post($name, $default, $caseInsensitive, $raw));
+            return strip_tags(self::Request($name, $default, $caseInsensitive, $raw));
         }
 
         public static function Request(?string $name = null, $default = null, bool $caseInsensitive = false, bool $raw = false)
@@ -173,11 +194,11 @@
             }
         }
 
-        public static function SafeRequest(?string $name = null, $default = null, bool $caseInsensitive = false, bool $raw = false)
+        public static function SafeServer(?string $name = null, $default = null, bool $caseInsensitive = false, bool $raw = false)
         {
             self::Init();
 
-            return strip_tags(self::Request($name, $default, $caseInsensitive, $raw));
+            return strip_tags(self::Server($name, $default, $caseInsensitive, $raw));
         }
 
         public static function Server(?string $name = null, $default = null, bool $caseInsensitive = false, bool $raw = false)
@@ -192,11 +213,11 @@
             }
         }
 
-        public static function SafeServer(?string $name = null, $default = null, bool $caseInsensitive = false, bool $raw = false)
+        public static function SafeCookie(?string $name = null, $default = null, bool $caseInsensitive = false, bool $raw = false)
         {
             self::Init();
 
-            return strip_tags(self::Server($name, $default, $caseInsensitive, $raw));
+            return strip_tags(self::Cookie($name, $default, $caseInsensitive, $raw));
         }
 
         public static function Cookie(?string $name = null, $default = null, bool $caseInsensitive = false, bool $raw = false)
@@ -211,11 +232,11 @@
             }
         }
 
-        public static function SafeCookie(?string $name = null, $default = null, bool $caseInsensitive = false, bool $raw = false)
+        public static function SafeHeader(?string $name = null, $default = null, bool $caseInsensitive = false)
         {
             self::Init();
 
-            return strip_tags(self::Cookie($name, $default, $caseInsensitive, $raw));
+            return strip_tags(self::Header($name, $default, $caseInsensitive));
         }
 
         public static function Header(?string $name = null, $default = null, bool $caseInsensitive = false)
@@ -225,32 +246,11 @@
             return Arr::Get($name, $caseInsensitive ? self::$dataEncodedCI['headers'] : self::$dataEncoded['headers'], $default);
         }
 
-        public static function SafeHeader(?string $name = null, $default = null, bool $caseInsensitive = false)
-        {
-            self::Init();
-
-            return strip_tags(self::Header($name, $default, $caseInsensitive));
-        }
-
         public static function Body() :string
         {
             self::Init();
 
             return self::$body;
-        }
-
-        public static function GetRequestMethod() :string
-        {
-            self::Init();
-
-            return strtoupper(self::$dataEncoded['server']['REQUEST_METHOD'] ?? 'GET');
-        }
-
-        public static function IsPostMethod() :bool
-        {
-            self::Init();
-
-            return self::GetRequestMethod() === 'POST';
         }
 
         public static function IsGetMethod() :bool
@@ -281,27 +281,6 @@
             return (bool)(self::Server('HTTP_X_REQUESTED_WITH', '') === 'XMLHttpRequest');
         }
 
-        public static function Protocol() :string
-        {
-            self::Init();
-
-            return self::$uriData['protocol'] ?? 'http://';
-        }
-
-        public static function Domain() :string
-        {
-            self::Init();
-
-            return self::$uriData['domain'] ?? 'localhost';
-        }
-
-        public static function Port() :int
-        {
-            self::Init();
-
-            return self::$uriData['port'] ?? 80;
-        }
-
         public static function Path(bool $array = false)
         {
             self::Init();
@@ -325,6 +304,27 @@
                    . ($port ? self::Port() : '')
                    . self::$uriData['path'] . ($trailSlash ? '/' : '')
                    . (self::$uriData['query'] ? '?' . self::$uriData['query'] : '');
+        }
+
+        public static function Protocol() :string
+        {
+            self::Init();
+
+            return self::$uriData['protocol'] ?? 'http://';
+        }
+
+        public static function Domain() :string
+        {
+            self::Init();
+
+            return self::$uriData['domain'] ?? 'localhost';
+        }
+
+        public static function Port() :int
+        {
+            self::Init();
+
+            return self::$uriData['port'] ?? 80;
         }
 
         public static function Referrer() :string

@@ -32,6 +32,26 @@
             }
         }
 
+        public static function Once(string $evtName, $listener)
+        {
+            if (isset(self::$listeners[$evtName]) && count(self::$listeners[$evtName]) >= Cfg::Get('App.events.maxListeners', 10)) {
+                trigger_error("Maximum listeners count [" . Cfg::Get('App.events.maxListeners', 10) . "] exceeded for event {$evtName}",
+                              E_NOTICE);
+            }
+
+            self::$listeners[$evtName][] = ['listener' => &$listener, 'once' => true];
+        }
+
+        public static function On(string $evtName, $listener)
+        {
+            if (isset(self::$listeners[$evtName]) && count(self::$listeners[$evtName]) >= Cfg::Get('App.events.maxListeners', 10)) {
+                trigger_error("Maximum listeners count [" . Cfg::Get('App.events.maxListeners', 10) . "] exceeded for event {$evtName}",
+                              E_NOTICE);
+            }
+
+            self::$listeners[$evtName][] = ['listener' => &$listener, 'once' => false];
+        }
+
         public static function Emit(string $evtName, array $payload)
         {
             if (!isset(self::$listeners[$evtName]) || !self::$listeners[$evtName]) {
@@ -54,34 +74,17 @@
             }
         }
 
-        public static function On(string $evtName, $listener)
-        {
-            if (isset(self::$listeners[$evtName]) && count(self::$listeners[$evtName]) >= Cfg::Get('App.events.maxListeners', 10)) {
-                trigger_error("Maximum listeners count [" . Cfg::Get('App.events.maxListeners', 10) . "] exceeded for event {$evtName}", E_NOTICE);
-            }
-
-            self::$listeners[$evtName][] = ['listener' => &$listener, 'once' => false];
-        }
-
         public static function PrependListener(string $evtName, $listener)
         {
             if (!isset(self::$listeners[$evtName])) {
                 self::$listeners[$evtName] = [];
             }
             else if (count(self::$listeners[$evtName]) >= Cfg::Get('App.events.maxListeners', 10)) {
-                trigger_error("Maximum listeners count [" . Cfg::Get('App.events.maxListeners', 10) . "] exceeded for event {$evtName}", E_NOTICE);
+                trigger_error("Maximum listeners count [" . Cfg::Get('App.events.maxListeners', 10) . "] exceeded for event {$evtName}",
+                              E_NOTICE);
             }
 
             array_unshift(self::$listeners[$evtName], ['listener' => &$listener, 'once' => false]);
-        }
-
-        public static function Once(string $evtName, $listener)
-        {
-            if (isset(self::$listeners[$evtName]) && count(self::$listeners[$evtName]) >= Cfg::Get('App.events.maxListeners', 10)) {
-                trigger_error("Maximum listeners count [" . Cfg::Get('App.events.maxListeners', 10) . "] exceeded for event {$evtName}", E_NOTICE);
-            }
-
-            self::$listeners[$evtName][] = ['listener' => &$listener, 'once' => true];
         }
 
         public static function PrependOnceListener(string $evtName, $listener)
@@ -90,7 +93,8 @@
                 self::$listeners[$evtName] = [];
             }
             else if (count(self::$listeners[$evtName]) >= Cfg::Get('App.events.maxListeners', 10)) {
-                trigger_error("Maximum listeners count [" . Cfg::Get('App.events.maxListeners', 10) . "] exceeded for event {$evtName}", E_NOTICE);
+                trigger_error("Maximum listeners count [" . Cfg::Get('App.events.maxListeners', 10) . "] exceeded for event {$evtName}",
+                              E_NOTICE);
             }
 
             array_unshift(self::$listeners[$evtName], ['listener' => &$listener, 'once' => true]);

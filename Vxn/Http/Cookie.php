@@ -17,6 +17,13 @@
 
         private static $inited;
 
+        public static function SafeGet(string $name, $default = null, bool $caseInsensitive = false, bool $raw = false)
+        {
+            self::Init();
+
+            return strip_tags(self::Get($name, $default, $caseInsensitive, $raw));
+        }
+
         private static function Init()
         {
             if (self::$inited) {
@@ -56,13 +63,6 @@
             else {
                 return Arr::Get($name, $raw ? self::$dataRaw : self::$data, $default);
             }
-        }
-
-        public static function SafeGet(string $name, $default = null, bool $caseInsensitive = false, bool $raw = false)
-        {
-            self::Init();
-
-            return strip_tags(self::Get($name, $default, $caseInsensitive, $raw));
         }
 
         public static function Set(string $name, string $value, int $ttl = 0, ?string $path = null, ?string $domain = null, bool $secure = false, $httpOnly = true) :bool

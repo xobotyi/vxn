@@ -24,7 +24,7 @@
             25   => 'text',
             26   => 'oid',
             30   => 'oidvector',
-            114   => 'json',
+            114  => 'json',
             143  => '_xml',
             194  => 'pg_node_tree',
             199  => '_json',

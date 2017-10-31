@@ -10,16 +10,16 @@
         private $tStart;
         private $tEnd;
 
+        public function start()
+        {
+            $this->tStart = self::getTime();
+        }
+
         private static function getTime(?int $time = null)
         {
             list($usec, $sec) = explode(" ", ((!is_null($time)) ? $time : microtime()));
 
             return ((float)$usec + (float)$sec);
-        }
-
-        public function start()
-        {
-            $this->tStart = self::getTime();
         }
 
         public function stop()

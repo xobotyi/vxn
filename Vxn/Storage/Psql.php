@@ -34,6 +34,95 @@
         private static $queriesCnt = 0;
 
         /**
+         * @return int
+         */
+        public static function QueriesPerformed() :int
+        {
+            return self::$queriesCnt;
+        }
+
+        /**
+         * @param string $query
+         * @param bool   $cached
+         * @param int    $ttl
+         * @param array  $tags
+         * @param bool   $prolong
+         *
+         * @return array|bool
+         * @throws \Exception
+         * @throws \TypeError
+         */
+        public static function GetCol(string $query, bool $cached = false, int $ttl = 60, array $tags = [], bool $prolong = true)
+        {
+            if ($md5 = self::$useCache && $cached ? md5($query) : "") {
+                if (($data = Memcache::get("pgsql:col:{$md5}")) !== false) {
+                    if ($prolong) {
+                        Memcache::set("pgsql:col:{$md5}", $data, $ttl, $tags);
+                    }
+
+                    return $data;
+                }
+            }
+
+            $res = self::Query($query);
+
+            if (!$res || !pg_num_rows($res)) {
+                return [];
+            }
+
+            $data = pg_fetch_all_columns($res, 0);
+            foreach ($data as &$field) {
+                self::TranspileFieldTypes($res, $field, 0);
+            }
+
+            if ($md5) {
+                Memcache::set("pgsql:col:{$md5}", $data, $ttl, $tags);
+            }
+
+            return $data ?: [];
+        }
+
+        /**
+         * @param string $query
+         *
+         * @return bool|resource
+         * @throws \Exception
+         */
+        public static function Query(string $query)
+        {
+            if (!$query) {
+                return false;
+            }
+
+            self::$queriesCnt++;
+            $res = pg_query(self::GetConnection(), $query);
+
+            if (!$res) {
+                $backtrace = debug_backtrace();
+
+                Log::Write('db',
+                           "Error occurred while performing PostgreSQL query." .
+                           "\n\tError: " . pg_last_error(self::GetConnection()) .
+                           "\n\tCalled in {$backtrace[1]['file']} at line {$backtrace[1]['line']}",
+                           'PostgreSQL',
+                           Log::LEVEL_CRITICAL);
+            }
+
+            return $res;
+        }
+
+        /**
+         * @return resource
+         * @throws \Exception
+         */
+        public static function GetConnection()
+        {
+            self::Init();
+
+            return self::$connection;
+        }
+
+        /**
          * @param null|string $host
          * @param int|null    $port
          * @param null|string $dbname
@@ -88,17 +177,6 @@
         }
 
         /**
-         * @return resource
-         * @throws \Exception
-         */
-        public static function GetConnection()
-        {
-            self::Init();
-
-            return self::$connection;
-        }
-
-        /**
          * @return bool
          */
         public static function CloseConnection() :bool
@@ -111,52 +189,45 @@
         }
 
         /**
-         * @return int
+         * @param $result
+         * @param $value
+         * @param $fieldNum
          */
-        public static function QueriesPerformed() :int
+        private static function TranspileFieldTypes(&$result, &$value, $fieldNum)
         {
-            return self::$queriesCnt;
-        }
+            switch (pg_field_type_oid($result, $fieldNum)) {
+                // int
+                case 20:
+                case 21:
+                case 23:
+                case 1005:
+                case 1007:
+                case 1016:
+                    $value = (int)$value;
+                    break;
 
-        /**
-         * @param string $query
-         * @param bool   $cached
-         * @param int    $ttl
-         * @param array  $tags
-         * @param bool   $prolong
-         *
-         * @return array|bool
-         * @throws \Exception
-         * @throws \TypeError
-         */
-        public static function GetCol(string $query, bool $cached = false, int $ttl = 60, array $tags = [], bool $prolong = true)
-        {
-            if ($md5 = self::$useCache && $cached ? md5($query) : "") {
-                if (($data = Memcache::get("pgsql:col:{$md5}")) !== false) {
-                    if ($prolong) {
-                        Memcache::set("pgsql:col:{$md5}", $data, $ttl, $tags);
-                    }
+                // float
+                case 700:
+                case 701:
+                case 1021:
+                case 1022:
+                    $value = (float)$value;
+                    break;
 
-                    return $data;
-                }
+                // boolean
+                case 16:
+                case 1000:
+                    $value = $value == 't';
+                    break;
+
+                // json
+                case 114:
+                case 199:
+                case 3807:
+                case 3802:
+                    $value = Json::Decode($value);
+                    break;
             }
-
-            $res = self::Query($query);
-
-            if (!$res || !pg_num_rows($res)) {
-                return [];
-            }
-
-            $data = pg_fetch_all_columns($res, 0);
-            foreach ($data as &$field) {
-                self::TranspileFieldTypes($res, $field, 0);
-            }
-
-            if ($md5) {
-                Memcache::set("pgsql:col:{$md5}", $data, $ttl, $tags);
-            }
-
-            return $data ?: [];
         }
 
         /**
@@ -282,77 +353,6 @@
             }
 
             return $data ?: null;
-        }
-
-        /**
-         * @param $result
-         * @param $value
-         * @param $fieldNum
-         */
-        private static function TranspileFieldTypes(&$result, &$value, $fieldNum)
-        {
-            switch (pg_field_type_oid($result, $fieldNum)) {
-                // int
-                case 20:
-                case 21:
-                case 23:
-                case 1005:
-                case 1007:
-                case 1016:
-                    $value = (int)$value;
-                break;
-
-                // float
-                case 700:
-                case 701:
-                case 1021:
-                case 1022:
-                    $value = (float)$value;
-                break;
-
-                // boolean
-                case 16:
-                case 1000:
-                    $value = $value == 't';
-                break;
-
-                // json
-                case 114:
-                case 199:
-                case 3807:
-                case 3802:
-                    $value = Json::Decode($value);
-                break;
-            }
-        }
-
-        /**
-         * @param string $query
-         *
-         * @return bool|resource
-         * @throws \Exception
-         */
-        public static function Query(string $query)
-        {
-            if (!$query) {
-                return false;
-            }
-
-            self::$queriesCnt++;
-            $res = pg_query(self::GetConnection(), $query);
-
-            if (!$res) {
-                $backtrace = debug_backtrace();
-
-                Log::Write('db',
-                           "Error occurred while performing PostgreSQL query." .
-                           "\n\tError: " . pg_last_error(self::GetConnection()) .
-                           "\n\tCalled in {$backtrace[1]['file']} at line {$backtrace[1]['line']}",
-                           'PostgreSQL',
-                           Log::LEVEL_CRITICAL);
-            }
-
-            return $res;
         }
 
         /**

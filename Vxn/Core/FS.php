@@ -144,15 +144,6 @@
             return $response;
         }
 
-        public static function IsFile(string $fPath) :bool
-        {
-            if (!$fPath) {
-                return false;
-            }
-
-            return is_file($fPath);
-        }
-
         public static function Load(string $fPath, bool $returnResult = false, bool $once = true)
         {
             if (!($fPath = realpath($fPath)) || !self::IsFile($fPath)) {
@@ -165,5 +156,14 @@
             else {
                 return $returnResult ? include $fPath : (bool)include $fPath;
             }
+        }
+
+        public static function IsFile(string $fPath) :bool
+        {
+            if (!$fPath) {
+                return false;
+            }
+
+            return is_file($fPath);
         }
     }
