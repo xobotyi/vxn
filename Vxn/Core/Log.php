@@ -10,6 +10,8 @@
 
     final class Log
     {
+        private static $logPath;
+
         public const LEVEL_WARNING   = 'WARNING';
         public const LEVEL_EMERGENCY = 'EMERGENCY';
         public const LEVEL_CRITICAL  = 'CRITICAL';
@@ -20,7 +22,7 @@
 
         public static function Write(string $logName, string $message, string $category = 'general', string $level = self::LEVEL_INFO) :bool
         {
-            $path = Cfg::Get('App.path.log', Autoloader::GetAutoloaderPath(VXN_RESERVED_NAMESPACE) . '/Log');
+            $path = self::$logPath ?: self::$logPath = Cfg::Get('App.path.log', Autoloader::GetAutoloaderPath(VXN_RESERVED_NAMESPACE) . '/Log');
 
             FS::MkDir($path);
 
@@ -29,7 +31,9 @@
 
         public static function Clear(string $logName) :bool
         {
-            return FS::Delete(Str::PathJoin(Cfg::Get('App.path.log', Autoloader::GetAutoloaderPath(VXN_RESERVED_NAMESPACE) . '/Log'), "{$logName}.log"));
+            $path = self::$logPath ?: self::$logPath = Cfg::Get('App.path.log', Autoloader::GetAutoloaderPath(VXN_RESERVED_NAMESPACE) . '/Log');
+
+            return FS::Delete(Str::PathJoin($path, "{$logName}.log"));
         }
 
         public static function Format(string $message, string $category = 'general', string $level = self::LEVEL_INFO) :string

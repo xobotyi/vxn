@@ -32,18 +32,18 @@
             }
         }
 
-        public static function Emit(string $evtName, array $data)
+        public static function Emit(string $evtName, array $payload)
         {
             if (!isset(self::$listeners[$evtName]) || !self::$listeners[$evtName]) {
                 return;
             }
 
-            self::$listeners[$evtName] = array_filter(self::$listeners[$evtName], function (&$entry) use ($data) {
+            self::$listeners[$evtName] = array_filter(self::$listeners[$evtName], function (&$entry) use ($payload) {
                 if (is_callable($entry['listener'])) {
-                    $entry['listener']($data);
+                    $entry['listener']($payload);
                 }
                 else {
-                    call_user_func_array($entry['listener'], [$data]);
+                    call_user_func_array($entry['listener'], [$payload]);
                 }
 
                 return !$entry['once'];
