@@ -9,7 +9,7 @@
     \Vxn\Core\Autoloader::Init();
 
     // registering autoload directories for App;
-    \Vxn\Core\Autoloader::Register('App', __DIR__ . '/App');
+    \Vxn\Core\Autoloader::Register('App', __DIR__);
 
     // configs load
     \Vxn\Core\Cfg::LoadPHP(__DIR__ . '/Cfg/Default.php');

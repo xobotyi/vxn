@@ -1,4 +1,0 @@
-<?php
-    /**
-     * @Author : Anton Zinovyev
-     */

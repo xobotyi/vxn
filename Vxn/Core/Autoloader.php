@@ -35,6 +35,21 @@
             spl_autoload_register('\\Vxn\\Core\\Autoloader::Load', true, true);
         }
 
+        public static function GetNewInstance(string $classNS, $arg = null)
+        {
+            if (self::Load($classNS)) {
+                $reflection = new \ReflectionClass($classNS);
+
+                if (!is_null($arg)) {
+                    return $reflection->newInstanceArgs($arg);
+                }
+
+                return $reflection->newInstance();
+            }
+
+            return null;
+        }
+
         public static function Load(string $ns) :bool
         {
             if (!$ns || !is_string($ns)) {
@@ -64,11 +79,13 @@
                 $path = realpath($path);
                 foreach ($ns as $item) {
                     if ($item != VXN_RESERVED_NAMESPACE) {
-                        self::$autoloaders[$ns] = $path;
+                        self::$autoloaders[$item] = $path;
                     }
                 }
+
+                return true;
             }
 
-            throw new \TypeError('Argument 1 must be of type array or integer, ' . gettype($ns) . 'given');
+            throw new \TypeError('Argument 1 must be of type array or integer, ' . gettype($ns) . ' given');
         }
     }

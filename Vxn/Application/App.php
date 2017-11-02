@@ -6,6 +6,9 @@
     namespace Vxn\Application;
 
 
+    use Vxn\Core\Cfg;
+    use Vxn\Core\FS;
+
     class App
     {
         /**
@@ -20,5 +23,8 @@
             }
 
             self::$inited = true;
+
+            FS::Load(Cfg::Get('App.path.app') . '/middleware.php');
+            FS::Load(Cfg::Get('App.path.app') . '/routes.php');
         }
     }
