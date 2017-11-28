@@ -29,10 +29,6 @@
          */
         private static $useTagsBuffer = true;
         /**
-         * @var \Memcache
-         */
-        private static $instance;
-        /**
          * @var int
          */
         private static $ttlDefault = 60;
@@ -44,6 +40,19 @@
          * @var int
          */
         private static $ttlTags = 604800;
+
+        /**
+         * @var \Memcache
+         */
+        private static $instance;
+        /**
+         * @var string
+         */
+        private static $host;
+        /**
+         * @var int
+         */
+        private static $port;
 
         /**
          * @return bool
@@ -61,6 +70,18 @@
         public static function GetInstance() :?\Memcache
         {
             self::Init();
+
+            if (!self::$instance) {
+                self::$instance = new \Memcache();
+
+                if (!self::$instance->connect(self::$host, self::$port ?: null)) {
+                    Log::Write('error',
+                               "Unable to connect to memcache server at " . self::$host . ':' . self::$port,
+                               "memcache",
+                               Log::LEVEL_CRITICAL);
+                    throw new \Exception("Unable to connect to memcache server at " . self::$host . ':' . self::$port);
+                }
+            }
 
             return self::$instance;
         }
@@ -87,23 +108,13 @@
 
             self::$inited = true;
 
-            $host = $host ?: Cfg::Get('Vxn.cache.memcache.host');
-            $port = $port ?: Cfg::Get('Vxn.cache.memcache.port');
+            self::$host = is_null($host) ? Cfg::Get('Vxn.cache.memcache.host') : $host;
+            self::$port = is_null($port) ? Cfg::Get('Vxn.cache.memcache.port') : $port;
 
-            self::$ttlDefault    = $ttlDefault ?: Cfg::Get('Vxn.cache.memcache.ttl.default');
-            self::$ttlMax        = $ttlMax ?: Cfg::Get('Vxn.cache.memcache.ttl.max');
-            self::$ttlTags       = $ttlTags ?: Cfg::Get('Vxn.cache.memcache.ttl.tags');
-            self::$useTagsBuffer = $useTagsBuffer ?: Cfg::Get('Vxn.cache.memcache.useTagsBuffer');
-
-            self::$instance = new \Memcache();
-
-            if (!self::$instance->connect($host, $port)) {
-                Log::Write('error',
-                           "Unable to connect to memcache server at {$host}:{$port}",
-                           "memcache",
-                           Log::LEVEL_CRITICAL);
-                throw new \Exception("Unable to connect to memcache server at {$host}:{$port}");
-            }
+            self::$ttlDefault    = is_null($ttlDefault) ? Cfg::Get('Vxn.cache.memcache.ttl.default') : $ttlDefault;
+            self::$ttlMax        = is_null($ttlMax) ? Cfg::Get('Vxn.cache.memcache.ttl.max') : $ttlMax;
+            self::$ttlTags       = is_null($ttlTags) ? Cfg::Get('Vxn.cache.memcache.ttl.tags') : $ttlTags;
+            self::$useTagsBuffer = is_null($useTagsBuffer) ? Cfg::Get('Vxn.cache.memcache.useTagsBuffer') : $useTagsBuffer;
 
             Engine::RegisterFinalShutdown(function () {
                 self::CloseConnection();
@@ -115,7 +126,7 @@
          */
         public static function IsSupported() :bool
         {
-            return class_exists('Memcache');
+            return class_exists('\Memcache');
         }
 
         /**

@@ -19,11 +19,6 @@
         private static $inited = false;
 
         /**
-         * @var bool
-         */
-        private static $useCache = true;
-
-        /**
          * @var \resource
          */
         private static $connection;
@@ -32,6 +27,18 @@
          * @var int
          */
         private static $queriesCnt = 0;
+
+        /**
+         * @var bool
+         */
+        private static $useCache = true;
+
+        private static $host;
+        private static $port;
+        private static $dbname;
+        private static $user;
+        private static $pass;
+        private static $encoding;
 
         /**
          * @return int
@@ -119,6 +126,29 @@
         {
             self::Init();
 
+            if (!self::$connection) {
+                self::$connection = pg_connect("host='" . self::$host . "' " .
+                                               "port='" . self::$port . "' " .
+                                               "dbname='" . self::$dbname . "' " .
+                                               "user='" . self::$user . "' " .
+                                               "password='" . self::$pass . "' " .
+                                               "options='--client_encoding=" . self::$encoding . "'");
+
+                if (!self::$connection) {
+                    Log::Write('error',
+                               "Unable to connect to PostgreSQL database." .
+                               "\n\tConnection string: [host='" . self::$host . "' " .
+                               "port='" . self::$port . "' " .
+                               "dbname='" . self::$dbname . "' " .
+                               "user='" . self::$user . "' " .
+                               "password='" . self::$pass . "' " .
+                               "options='--client_encoding=" . self::$encoding . "']",
+                               'PostgreSQL',
+                               Log::LEVEL_EMERGENCY);
+                    throw new \Exception('Unable to connect to PostgreSQL database');
+                }
+            }
+
             return self::$connection;
         }
 
@@ -132,7 +162,7 @@
          *
          * @throws \Exception
          */
-        public static function Init(?string $host = null, ?int $port = null, ?string $dbname = null, ?string $user = null, ?string $pass = null, ?string $encoding = 'UTF8') :void
+        public static function Init(?string $host = null, ?int $port = null, ?string $dbname = null, ?string $user = null, ?string $pass = null, ?string $encoding = 'UTF8', ?bool $useCache = null) :void
         {
             if (!self::IsSupported()) {
                 throw new \Exception('PostgreSQL is not supported!');
@@ -142,26 +172,15 @@
                 return;
             }
 
-            self::$inited   = true;
-            self::$useCache = Cfg::Get('Vxn.storage.postgres.useCache', false);
+            self::$inited = true;
 
-            $host     = $host ?: Cfg::Get('Vxn.storage.postgres.host', '127.0.0.1');
-            $port     = $port ?: Cfg::Get('Vxn.storage.postgres.port', '5432');
-            $dbname   = $dbname ?: Cfg::Get('Vxn.storage.postgres.dbname', '');
-            $user     = $user ?: Cfg::Get('Vxn.storage.postgres.user', '');
-            $pass     = $pass ?: Cfg::Get('Vxn.storage.postgres.pass', '');
-            $encoding = $encoding ?: Cfg::Get('Vxn.storage.postgres.encoding', 'UTF8');
-
-            self::$connection = pg_connect("host={$host} port={$port} dbname={$dbname} user={$user} password={$pass} options='--client_encoding={$encoding}'");
-
-            if (!self::$connection) {
-                Log::Write('error',
-                           "Unable to connect to PostgreSQL database." .
-                           "\n\tConnection string: [host={$host} port={$port} dbname={$dbname} user={$user} password={$pass} options='--client_encoding={$encoding}']",
-                           'PostgreSQL',
-                           Log::LEVEL_EMERGENCY);
-                throw new \Exception('Unable to connect to PostgreSQL database');
-            }
+            self::$host     = is_null($host) ? Cfg::Get('Vxn.storage.postgres.host', '127.0.0.1') : $host;
+            self::$port     = is_null($port) ? Cfg::Get('Vxn.storage.postgres.port', '5432') : $port;
+            self::$dbname   = is_null($dbname) ? Cfg::Get('Vxn.storage.postgres.dbname', '') : $dbname;
+            self::$user     = is_null($user) ? Cfg::Get('Vxn.storage.postgres.user', '') : $user;
+            self::$pass     = is_null($pass) ? Cfg::Get('Vxn.storage.postgres.pass', '') : $pass;
+            self::$encoding = is_null($encoding) ? Cfg::Get('Vxn.storage.postgres.encoding', 'UTF8') : $encoding;
+            self::$useCache = is_null($useCache) ? Cfg::Get('Vxn.storage.postgres.useCache', false) : $useCache;
 
             Engine::RegisterFinalShutdown(function () {
                 self::CloseConnection();

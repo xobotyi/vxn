@@ -8,15 +8,13 @@
 
     class Middleware
     {
+        public const STAGE_PRE  = 'pre';
+        public const STAGE_POST = 'post';
         private static $global = [
             'pre'  => [],
             'post' => [],
         ];
-
         private static $alias = [];
-
-        public const STAGE_PRE  = 'pre';
-        public const STAGE_POST = 'post';
 
         public static function RegisterPre($middleware) :bool
         {

@@ -81,44 +81,6 @@
             return false;
         }
 
-        public static function GetModuleNS(string $name) :?string
-        {
-            if (!($name = trim($name))) {
-                return null;
-            }
-
-            $name = Str::UpFirstSymbol($name, true);
-
-            return "\\App\\Module\\{$name}\\{$name}Module";
-        }
-
-        public static function CallModuleAction(string $moduleNS, string $actionName = 'Default', array &$parameters = [], array &$data = []) :?bool
-        {
-            $obj = self::$reflections[$moduleNS] ?? Autoloader::GetNewInstance($moduleNS);
-
-            if (!$obj) {
-                return null;
-            }
-
-            $currentMethod = Request::GetRequestMethod();
-
-            $actionName         = 'Action' . Str::UpFirstSymbol($actionName);
-            $actionNameAll      = 'all' . $actionName;
-            $actionNameStraight = strtolower($currentMethod) . $actionName;
-
-            if (method_exists($obj, $actionNameStraight)) {
-                return $obj->$actionNameStraight($parameters, $data);
-            }
-            else if (method_exists($obj, $actionName)) {
-                return $obj->$actionName($parameters, $data);
-            }
-            else if (method_exists($obj, $actionNameAll)) {
-                return $obj->$actionNameAll($parameters, $data);
-            }
-
-            return null;
-        }
-
         public static function GetRoute($path = null) :array
         {
             if (is_string($path)) {
@@ -273,5 +235,43 @@
                 'rules'    => $regexpParam,
                 'dataPos'  => $dataPos,
             ];
+        }
+
+        public static function GetModuleNS(string $name) :?string
+        {
+            if (!($name = trim($name))) {
+                return null;
+            }
+
+            $name = Str::UpFirstSymbol($name, true);
+
+            return "\\App\\Module\\{$name}\\{$name}Module";
+        }
+
+        public static function CallModuleAction(string $moduleNS, string $actionName = 'Default', array &$parameters = [], array &$data = []) :?bool
+        {
+            $obj = self::$reflections[$moduleNS] ?? Autoloader::GetNewInstance($moduleNS);
+
+            if (!$obj) {
+                return null;
+            }
+
+            $currentMethod = Request::GetRequestMethod();
+
+            $actionName         = 'Action' . Str::UpFirstSymbol($actionName);
+            $actionNameAll      = 'all' . $actionName;
+            $actionNameStraight = strtolower($currentMethod) . $actionName;
+
+            if (method_exists($obj, $actionNameStraight)) {
+                return $obj->$actionNameStraight($parameters, $data);
+            }
+            else if (method_exists($obj, $actionName)) {
+                return $obj->$actionName($parameters, $data);
+            }
+            else if (method_exists($obj, $actionNameAll)) {
+                return $obj->$actionNameAll($parameters, $data);
+            }
+
+            return null;
         }
     }
