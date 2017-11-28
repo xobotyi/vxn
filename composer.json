@@ -5,6 +5,7 @@
   "keywords": [
     "vxn",
     "toolset",
+    "php",
     "framework"
   ],
   "license": "New BSD",
@@ -21,7 +22,7 @@
   },
   "autoload": {
     "psr-0": {
-      "Nerufio": "src/"
+      "Vxn": "src/"
     }
   }
 }
