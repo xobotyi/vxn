@@ -25,7 +25,7 @@
 
             mb_internal_encoding("UTF-8");
 
-            $vxn_path = realpath(__DIR__ . '/../../');
+            $vxn_path = realpath(__DIR__ . '/../vxn/');
 
             include_once $vxn_path . '/Vxn/Helper/Str.php';
             include_once $vxn_path . '/Vxn/Core/FS.php';

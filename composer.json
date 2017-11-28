@@ -1,4 +1,21 @@
 {
-    "require": {
+  "name": "xobotyi/vxn",
+  "description": "Simple php toolset, almost framework, but no =)",
+  "type": "library",
+  "authors": [
+    {
+      "name": "Anton Zinovyev",
+      "email": "xog3@yandex.ru",
+      "role": "Founder"
     }
+  ],
+  "require": {
+    "php": ">=7.1",
+    "ezyang/htmlpurifier": "~4.9.3"
+  },
+  "autoload": {
+    "psr-0": {
+      "Nerufio": "src/"
+    }
+  }
 }

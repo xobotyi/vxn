@@ -17,6 +17,7 @@
         public const LEVEL_INFO      = 'INFO';
         public const LEVEL_DEBUG     = 'DEBUG';
         public const LEVEL_NOTICE    = 'NOTICE';
+
         private static $logPath;
 
         public static function Write(string $logName, string $message, string $category = 'general', string $level = self::LEVEL_INFO) :bool
@@ -31,7 +32,10 @@
 
         public static function Format(string $message, string $category = 'general', string $level = self::LEVEL_INFO) :string
         {
-            return date('Y-m-d H:i:s') . "[" . Request::UserIp() . "] [{$level}] [{$category}] " . rtrim($message) . "\n";
+            return date('Y-m-d H:i:s') . " [{$level}] [{$category}] " .
+                   "[" . Request::UserIp() . "] " .
+                   "[" . Request::Path() . "] " .
+                   rtrim($message) . "\n";
         }
 
         public static function Clear(string $logName) :bool

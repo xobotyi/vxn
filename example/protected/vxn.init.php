@@ -4,6 +4,7 @@
      */
 
     // loading vxn autoloader
+    include_once __DIR__ . '/vendor/autoload.php';
     include_once __DIR__ . '/Vxn/Core/Autoloader.php';
 
     \Vxn\Core\Autoloader::Init();
@@ -17,3 +18,8 @@
 
     error_reporting(-1);
     ini_set('display_errors', \Vxn\Core\Cfg::Get('App.debug') ? 'On' : 'Off');
+
+    \Vxn\Application\View\Tpl::Init();
+    \Vxn\Core\I18n::Init();
+
+    echo \Vxn\Application\View\Tpl::Hydrate('message', ['page' => ['language' => 'en', 'title' => 'test!']]);
