@@ -1,0 +1,15 @@
+{@ include "header" @}
+
+<div class="contentWrapper">
+    {# thi is comment #}
+    <div id="message">
+        {@ if message.title @}
+        <div class="title">{ message.title }</div>
+        {@ endif @}
+        {@ if message.text @}
+        <div class="text">{ message.text }</div>
+        {@ endif @}
+    </div>
+</div>
+
+{@ include "footer" @}

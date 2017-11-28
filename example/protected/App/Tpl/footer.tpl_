@@ -1,0 +1,9 @@
+<?php
+    $data = $data ?? [];
+?>
+<footer>
+    <div class="text">©2009—<?= date('Y') ?></div>
+</footer>
+</div>
+</body>
+</html>

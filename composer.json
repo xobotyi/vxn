@@ -1,7 +1,13 @@
 {
   "name": "xobotyi/vxn",
-  "description": "Simple php toolset, almost framework, but no =)",
+  "description": "Simple PHP 7.1+ toolset, almost framework, but not =)",
   "type": "library",
+  "keywords": [
+    "vxn",
+    "toolset",
+    "framework"
+  ],
+  "license": "New BSD",
   "authors": [
     {
       "name": "Anton Zinovyev",
