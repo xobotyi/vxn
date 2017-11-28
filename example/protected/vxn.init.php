@@ -3,9 +3,8 @@
      * @Author : Anton Zinovyev
      */
 
-    // loading vxn autoloader
+    // loading composer
     include_once __DIR__ . '/vendor/autoload.php';
-    include_once __DIR__ . '/Vxn/Core/Autoloader.php';
 
     \Vxn\Core\Autoloader::Init();
 

@@ -10,7 +10,7 @@
     $cfg['App']['host']  = gethostname();
     $cfg['App']['debug'] = $cfg['App']['contour'] !== 'dev' ? false : true;
 
-    $cfg['App']['path']['base']  = realpath(__DIR__ . '/vxn/');
+    $cfg['App']['path']['base']  = realpath(__DIR__ . '/../');
     $cfg['App']['path']['cfg']   = $cfg['App']['path']['base'] . '/Cfg';
     $cfg['App']['path']['log']   = $cfg['App']['path']['base'] . '/log';
     $cfg['App']['path']['cache'] = $cfg['App']['path']['base'] . '/cache';

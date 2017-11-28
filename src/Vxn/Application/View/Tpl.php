@@ -29,12 +29,12 @@
 
             self::$inited = true;
 
-            self::$tplPath  = $tplPath = $tplPath ?: Cfg::Get('App.path.tpl');
-            self::$useCache = $useCache ?: Cfg::Get('App.templates.cache.enabled', false);
-            self::$cacheTTL = $cacheTTL ?: Cfg::Get('App.templates.cache.ttl', 60);
+            self::$tplPath  = is_null($tplPath) ? Cfg::Get('App.path.tpl') : $tplPath;
+            self::$useCache = is_null($useCache) ? Cfg::Get('App.templates.cache.enabled', false) : $useCache;
+            self::$cacheTTL = is_null($cacheTTL) ? Cfg::Get('App.templates.cache.ttl', 60) : $cacheTTL;
 
-            if (!FS::IsDir($tplPath)) {
-                throw new \Error("Templates dir {$tplPath} not exists");
+            if (!FS::IsDir(self::$tplPath)) {
+                throw new \Error("Templates dir " . self::$tplPath . " not exists");
             }
 
             return true;
