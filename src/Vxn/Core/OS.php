@@ -73,4 +73,15 @@
 
             return $result;
         }
+
+        public static function IsPidRunning(int $pid) :bool
+        {
+            self::Init();
+
+            if (self::$osName === 'Linux') {
+                return FS::IsDir("/proc/{$pid}");
+            }
+
+            throw new \Error("Unsupported OS [" . self::$osName . "]");
+        }
     }
