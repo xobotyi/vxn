@@ -9,7 +9,7 @@
     use Vxn\Core\Cfg;
     use Vxn\Core\Engine;
     use Vxn\Core\Log;
-    use Vxn\Helper\Json;
+    use Vxn\Helper\Encode\Json;
 
     final class Psql
     {
