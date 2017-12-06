@@ -9,15 +9,30 @@
 
     final class Response
     {
+        /**
+         * @var string
+         */
         private static $status = HttpStatusCode::STATUS_200;
 
+        /**
+         * @var array
+         */
         private static $headers = [];
 
+        /**
+         * @return int
+         */
         public static function GetStatus() :int
         {
             return self::$status;
         }
 
+        /**
+         * @param int  $status
+         * @param bool $exit
+         *
+         * @throws \Error
+         */
         public static function SetStatus(int $status, bool $exit = false) :void
         {
             if (!HttpStatusCode::IsSupported($status)) {
@@ -33,6 +48,12 @@
             }
         }
 
+        /**
+         * @param array $names
+         * @param bool  $immediately
+         *
+         * @throws \Error
+         */
         public static function RemoveGetParameter(array $names = [], bool $immediately = false) :void
         {
             if (!$names || !($query = Request::Get())) {
@@ -53,6 +74,12 @@
             }
         }
 
+        /**
+         * @param string $uri
+         * @param bool   $immediately
+         *
+         * @throws \Error
+         */
         public static function Redirect(string $uri = '/', bool $immediately = false) :void
         {
             self::AddNoCacheHeaders();
@@ -65,6 +92,9 @@
             }
         }
 
+        /**
+         *
+         */
         public static function AddNoCacheHeaders() :void
         {
             self::AddHeader('Cache-Control', 'no-cache,no-store,max-age=0,must-revalidate');
@@ -72,6 +102,11 @@
             self::AddHeader('Pragma', 'no-cache');
         }
 
+        /**
+         * @param string $name
+         * @param string $value
+         * @param bool   $replace
+         */
         public static function AddHeader(string $name, string $value, bool $replace = true) :void
         {
             if ($replace) {
@@ -79,6 +114,20 @@
             }
         }
 
+        /**
+         * @param string $name
+         */
+        public static function RemoveHeader(string $name) :void
+        {
+            self::$headers = array_filter(self::$headers, function ($header) use (&$name) {
+                return $header['name'] !== $name;
+            });
+            header_remove($name);
+        }
+
+        /**
+         *
+         */
         public static function ApplyHeaders() :void
         {
             foreach (self::$headers as $header) {
@@ -86,11 +135,20 @@
             }
         }
 
+        /**
+         * @param $type
+         */
         public static function SetContentType($type)
         {
             self::AddHeader('Content-Type', $type . '; charset=UTF-8');
         }
 
+        /**
+         * @param string $uri
+         * @param bool   $immediately
+         *
+         * @throws \Error
+         */
         public static function RedirectPermanently(string $uri = '/', bool $immediately = false) :void
         {
             self::SetStatus(HttpStatusCode::STATUS_301);

@@ -56,7 +56,7 @@
             self::$uriData['path']     = rtrim(str_replace("?" . self::$uriData['query'], '', $_SERVER['REQUEST_URI'] ?? ''), '/');
 
             parse_str(self::$uriData['query'], self::$uriData['queryArr']);
-            self::$uriData['pathArr'] = explode('/', self::$uriData['path']);
+            self::$uriData['pathArr'] = explode('/', trim(self::$uriData['path'], '/'));
 
             // Encoded data fill
             self::$dataEncoded['get']     = $_GET;

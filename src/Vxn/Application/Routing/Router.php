@@ -54,7 +54,7 @@
 
         public static function Resolve($forced = false)
         {
-            if (self::$resolved || !$forced) {
+            if (self::$resolved && !$forced) {
                 return null;
             }
 
@@ -62,7 +62,7 @@
 
             $endpoint = self::GetRoute(Request::Path(true));
 
-            if (!Middleware::FireAlias($endpoint['middleware'], Middleware::STAGE_PRE)) {
+            if ($endpoint['middleware'] && !Middleware::FireAlias($endpoint['middleware'], Middleware::STAGE_PRE)) {
                 return false;
             }
 
@@ -258,7 +258,7 @@
 
             $currentMethod = Request::GetRequestMethod();
 
-            $actionName         = 'Action' . Str::UpFirstSymbol($actionName);
+            $actionName         = 'action' . Str::UpFirstSymbol($actionName);
             $actionNameAll      = 'all' . $actionName;
             $actionNameStraight = strtolower($currentMethod) . $actionName;
 
