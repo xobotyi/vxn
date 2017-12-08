@@ -20,5 +20,3 @@
 
     \Vxn\Application\View\Tpl::Init();
     \Vxn\Core\I18n::Init();
-
-    echo \Vxn\Application\View\Tpl::Hydrate('message', ['page' => ['language' => 'en', 'title' => 'test!']]);
