@@ -35,6 +35,15 @@
             $this->setContentType(self::RESPONSE_TYPE_HTML);
         }
 
+        public function setSubmodulesDir(string $dirName) :self
+        {
+            $this->submodulesNS = "\\" .
+                                  substr(static::class, 0, strrpos(static::class, '\\')) .
+                                  str_replace('/', '\\', $dirName);
+
+            return $this;
+        }
+
         protected function setContentType(string $contentType) :self
         {
             if (!in_array($contentType, self::RESPONSE_TYPES_LIST)) {
@@ -86,15 +95,6 @@
                     Response::RemoveHeader('Access-Control-Allow-Headers');
                 }
             }
-
-            return $this;
-        }
-
-        public function setSubmodulesDir(string $dirName) :self
-        {
-            $this->submodulesNS = "\\" .
-                                  substr(static::class, 0, strrpos(static::class, '\\')) .
-                                  str_replace('/', '\\', $dirName);
 
             return $this;
         }

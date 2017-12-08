@@ -5,8 +5,6 @@
 
     namespace Vxn\Http;
 
-    use Vxn\Helper\Arr;
-
     final class Cookie
     {
         private static $data   = [];
@@ -58,10 +56,10 @@
             self::Init();
 
             if ($caseInsensitive) {
-                return Arr::Get($name, $raw ? self::$dataRawCI : self::$dataCI, $default);
+                return ($raw ? self::$dataRawCI : self::$dataCI)[$name] ?? $default;
             }
             else {
-                return Arr::Get($name, $raw ? self::$dataRaw : self::$data, $default);
+                return ($raw ? self::$dataRaw : self::$data)[$name] ?? $default;
             }
         }
 

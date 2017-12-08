@@ -18,7 +18,8 @@
   ],
   "require": {
     "php": ">=7.1",
-    "ezyang/htmlpurifier": "~4.9.3"
+    "ezyang/htmlpurifier": "~4.9.3",
+    "xoboty/dotarray": "^1.0.5"
   },
   "autoload": {
     "psr-0": {

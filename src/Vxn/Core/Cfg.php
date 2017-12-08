@@ -5,8 +5,8 @@
 
     namespace Vxn\Core;
 
-    use Vxn\Helper\Arr;
     use Vxn\Helper\Str;
+    use xobotyi\A;
 
     final class Cfg
     {
@@ -14,7 +14,7 @@
 
         public static function Get($name, $default = null)
         {
-            return Arr::Get($name, self::$configs, $default);
+            return A::get(self::$configs, $name, $default);
         }
 
         public static function LoadPHP(string $cfgPath) :bool

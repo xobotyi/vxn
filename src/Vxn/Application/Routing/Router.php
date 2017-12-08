@@ -7,9 +7,9 @@
 
 
     use Vxn\Core\Autoloader;
-    use Vxn\Helper\Arr;
     use Vxn\Helper\Str;
     use Vxn\Http\Request;
+    use xobotyi\A;
 
     class Router
     {
@@ -96,9 +96,7 @@
                     $route['method'] = explode(' ', $route['method']);
                     $currentMethod   = Request::GetRequestMethod();
 
-                    if (!Arr::Any($route['method'], function (&$method) use (&$currentMethod) {
-                        var_dump($method, $currentMethod);
-
+                    if (!A::any($route['method'], function (&$method) use (&$currentMethod) {
                         return $method === $currentMethod;
                     })) {
                         continue;

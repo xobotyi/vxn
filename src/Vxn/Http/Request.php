@@ -6,7 +6,6 @@
     namespace Vxn\Http;
 
     use Vxn\Core\FS;
-    use Vxn\Helper\Arr;
 
     final class Request
     {
@@ -149,10 +148,10 @@
             self::Init();
 
             if ($caseInsensitive) {
-                return Arr::Get($name, $raw ? self::$dataRawCI['get'] : self::$dataEncodedCI['get'], $default);
+                return ($raw ? self::$dataRawCI['get'] : self::$dataEncodedCI['get'])[$name] ?? $default;
             }
             else {
-                return Arr::Get($name, $raw ? self::$dataRaw['get'] : self::$dataEncoded['get'], $default);
+                return ($raw ? self::$dataRaw['get'] : self::$dataEncoded['get'])[$name] ?? $default;
             }
         }
 
@@ -168,10 +167,10 @@
             self::Init();
 
             if ($caseInsensitive) {
-                return Arr::Get($name, $raw ? self::$dataRawCI['post'] : self::$dataEncodedCI['post'], $default);
+                return ($raw ? self::$dataRawCI['post'] : self::$dataEncodedCI['post'])[$name] ?? $default;
             }
             else {
-                return Arr::Get($name, $raw ? self::$dataRaw['post'] : self::$dataEncoded['post'], $default);
+                return ($raw ? self::$dataRaw['post'] : self::$dataEncoded['post'])[$name] ?? $default;
             }
         }
 
@@ -187,10 +186,10 @@
             self::Init();
 
             if ($caseInsensitive) {
-                return Arr::Get($name, $raw ? self::$dataRawCI['request'] : self::$dataEncodedCI['request'], $default);
+                return ($raw ? self::$dataRawCI['request'] : self::$dataEncodedCI['request'])[$name] ?? $default;
             }
             else {
-                return Arr::Get($name, $raw ? self::$dataRaw['request'] : self::$dataEncoded['request'], $default);
+                return ($raw ? self::$dataRaw['request'] : self::$dataEncoded['request'])[$name] ?? $default;
             }
         }
 
@@ -205,11 +204,12 @@
         {
             self::Init();
 
+
             if ($caseInsensitive) {
-                return Arr::Get($name, $raw ? self::$dataRawCI['server'] : self::$dataEncodedCI['server'], $default);
+                return ($raw ? self::$dataRawCI['server'] : self::$dataEncodedCI['server'])[$name] ?? $default;
             }
             else {
-                return Arr::Get($name, $raw ? self::$dataRaw['server'] : self::$dataEncoded['server'], $default);
+                return ($raw ? self::$dataRaw['server'] : self::$dataEncoded['server'])[$name] ?? $default;
             }
         }
 
@@ -224,11 +224,12 @@
         {
             self::Init();
 
+
             if ($caseInsensitive) {
-                return Arr::Get($name, $raw ? self::$dataRawCI['cookie'] : self::$dataEncodedCI['cookie'], $default);
+                return ($raw ? self::$dataRawCI['cookie'] : self::$dataEncodedCI['cookie'])[$name] ?? $default;
             }
             else {
-                return Arr::Get($name, $raw ? self::$dataRaw['cookie'] : self::$dataEncoded['cookie'], $default);
+                return ($raw ? self::$dataRaw['cookie'] : self::$dataEncoded['cookie'])[$name] ?? $default;
             }
         }
 
@@ -243,7 +244,7 @@
         {
             self::Init();
 
-            return Arr::Get($name, $caseInsensitive ? self::$dataEncodedCI['headers'] : self::$dataEncoded['headers'], $default);
+            return ($caseInsensitive ? self::$dataEncodedCI['headers'] : self::$dataEncoded['headers'])[$name] ?? $default;
         }
 
         public static function Body() :string

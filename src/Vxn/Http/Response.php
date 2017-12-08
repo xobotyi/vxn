@@ -115,6 +115,16 @@
         }
 
         /**
+         *
+         */
+        public static function ApplyHeaders() :void
+        {
+            foreach (self::$headers as $header) {
+                header("{$header['name']}: {$header['value']}", $header['replace']);
+            }
+        }
+
+        /**
          * @param string $name
          */
         public static function RemoveHeader(string $name) :void
@@ -123,16 +133,6 @@
                 return $header['name'] !== $name;
             });
             header_remove($name);
-        }
-
-        /**
-         *
-         */
-        public static function ApplyHeaders() :void
-        {
-            foreach (self::$headers as $header) {
-                header("{$header['name']}: {$header['value']}", $header['replace']);
-            }
         }
 
         /**

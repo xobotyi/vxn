@@ -5,8 +5,6 @@
 
     namespace Vxn\Core;
 
-    use Vxn\Helper\Arr;
-
     final class I18n
     {
         private static $inited = false;
@@ -131,9 +129,9 @@
         public static function ProcessString(string $str, array $data = [], ?string $lang = null) :string
         {
             return preg_replace_callback(
-                '~\:(?<var>[a-z0-9\_\$]+(?:\.[a-z0-9_]+)*)\:(?:(?<pluralSpacer>[ \t]*)\((?<plurals>[^\|]+(?:\|[^\|]+)*)\))?~ui',
+                '~\:(?<var>[^\)])\:(?:(?<pluralSpacer>[ \t]*)\((?<plurals>[^\|]+(?:\|[^\|]+)*)\))?~ui',
                 function (&$match) use (&$data, &$lang) {
-                    $replacement = Arr::Get($match['var'], $data, null);
+                    $replacement = $data[$match['var']] ?? null;
 
                     if (is_null($replacement)) {
                         return $match[0];

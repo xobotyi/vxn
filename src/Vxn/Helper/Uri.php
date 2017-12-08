@@ -26,17 +26,17 @@
             preg_match('/^(([^:\/\?#]+):)?(\/\/((([^\/\?#]*)@)?([^\/\?#:]*)(:([^\/\?#]*))?))?([^\?#]*)(\?([^#]*))?(#(.*))?/i', $string,
                        $matches);
 
-            $this->_all               = Arr::Get(0, $matches);
-            $this->_scheme            = Arr::Get(2, $matches);
-            $this->_protocol          = Arr::Get(1, $matches) . '//';
-            $this->_authority         = Arr::Get(4, $matches);
-            $this->_user_info         = Arr::Get(6, $matches);
-            $this->_host              = Arr::Get(7, $matches);
-            $this->_port              = (int)Arr::Get(9, $matches);
-            $this->_path              = Arr::Get(10, $matches);
-            $this->_query             = Arr::Get(12, $matches);
-            $this->_fragment          = Arr::Get(14, $matches);
-            $this->_hierarchical_part = Arr::Get(4, $matches) . $this->_path;
+            $this->_all               = ($matches[0] ?? null);
+            $this->_scheme            = ($matches[2] ?? null);
+            $this->_protocol          = ($matches[1] ?? null) . '//';
+            $this->_authority         = ($matches[4] ?? null);
+            $this->_user_info         = ($matches[6] ?? null);
+            $this->_host              = ($matches[7] ?? null);
+            $this->_port              = (int)($matches[9] ?? null);
+            $this->_path              = ($matches[10] ?? null);
+            $this->_query             = ($matches[12] ?? null);
+            $this->_fragment          = ($matches[14] ?? null);
+            $this->_hierarchical_part = $this->_authority . $this->_path;
         }
 
         public function GetAuthority() :string

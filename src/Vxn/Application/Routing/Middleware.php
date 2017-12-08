@@ -14,7 +14,7 @@
             'pre'  => [],
             'post' => [],
         ];
-        private static $alias = [];
+        private static $alias  = [];
 
         public static function RegisterPre($middleware) :bool
         {
