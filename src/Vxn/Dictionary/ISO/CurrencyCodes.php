@@ -3,8 +3,6 @@
     namespace Vxn\Dictionary\ISO;
 
 
-    use Vxn\Helper\Arr;
-
     final class CurrencyCodes
     {
         private static $codes = [
@@ -187,18 +185,18 @@
             "usn" => "US Dollar (Next day)",
         ];
 
-        public static function Get($code)
+        public static function GetName($code) :?string
         {
-            return Arr::Get($code, self::$codes);
+            return self::$codes[$code] ?? null;
         }
 
-        public static function GetList()
+        public static function IsSupported($code) :bool
         {
-            return Arr::Get(null, self::$codes);
+            return isset(self::$codes[$code]);
         }
 
-        public static function IsSupported($code)
+        public static function GetList() :array
         {
-            return Arr::Check($code, self::$codes);
+            return self::$codes;
         }
     }

@@ -2,8 +2,6 @@
 
     namespace Vxn\Dictionary\ISO;
 
-    use Vxn\Helper\Arr;
-
     final class ContinentCodes
     {
         private static $codes = [
@@ -16,18 +14,18 @@
             'an' => 'Antarctica',
         ];
 
-        public static function Get(string $code) : ?string
+        public static function GetName(string $code) :?string
         {
-            return Arr::Get($code, self::$codes);
+            return self::$codes[$code] ?? null;
+        }
+
+        public static function IsSupported(string $code) :bool
+        {
+            return isset(self::$codes[$code]);
         }
 
         public static function GetList() :array
         {
             return self::$codes ?: [];
-        }
-
-        public static function IsSupported(string $code) :bool
-        {
-            return Arr::Check($code, self::$codes);
         }
     }

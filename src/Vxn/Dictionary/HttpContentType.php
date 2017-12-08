@@ -240,4 +240,9 @@
         {
             return in_array($type, self::$typesList);
         }
+
+        public static function GetList() :array
+        {
+            return self::$typesList;
+        }
     }

@@ -3,8 +3,6 @@
     namespace Vxn\Dictionary\ISO;
 
 
-    use Vxn\Helper\Arr;
-
     final class CountryCodes
     {
         private static $codes = [
@@ -258,18 +256,18 @@
             "zwe" => "Zimbabwe",
         ];
 
-        public static function Get($code)
+        public static function GetName($code) :?string
         {
-            return Arr::Get($code, self::$codes);
+            return self::$codes[$code] ?? null;
         }
 
-        public static function GetList()
+        public static function IsSupported($code) :bool
+        {
+            return isset(self::$codes[$code]);
+        }
+
+        public static function GetList() :array
         {
             return self::$codes;
-        }
-
-        public static function IsSupported($code)
-        {
-            return Arr::Check($code, self::$codes);
         }
     }

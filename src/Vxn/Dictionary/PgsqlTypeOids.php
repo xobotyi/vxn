@@ -125,16 +125,16 @@
 
         public static function GetType($oid) :?string
         {
-            return self::$oids[$oid];
-        }
-
-        public static function GetList() :array
-        {
-            return self::$oids ?: [];
+            return self::$oids[$oid] ?? null;
         }
 
         public static function IsSupported($oid) :bool
         {
             return in_array($oid, self::$oids);
+        }
+
+        public static function GetList() :array
+        {
+            return self::$oids ?: [];
         }
     }

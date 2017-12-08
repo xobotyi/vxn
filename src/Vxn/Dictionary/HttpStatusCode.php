@@ -5,8 +5,6 @@
 
     namespace Vxn\Dictionary;
 
-    use Vxn\Helper\Arr;
-
     final class HttpStatusCode
     {
         // 2xx Success
@@ -124,18 +122,18 @@
             511 => 'Network Authentication Required',
         ];
 
-        public static function GetStatusName($status) :?string
+        public static function GetName($status) :?string
         {
-            return Arr::Get($status, self::$statusName);
+            return self::$statusName[$status] ?? null;
+        }
+
+        public static function IsSupported($status) :bool
+        {
+            return isset(self::$statusList[$status]);
         }
 
         public static function GetList() :array
         {
-            return self::$statusList ?: [];
-        }
-
-        public static function IsSupported($type) :bool
-        {
-            return in_array($type, self::$statusList);
+            return self::$statusList;
         }
     }

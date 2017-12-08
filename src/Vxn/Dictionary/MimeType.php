@@ -5,8 +5,6 @@
 
     namespace Vxn\Dictionary;
 
-    use Vxn\Helper\Arr;
-
     final class MimeType
     {
         private static $mimeTypes = [
@@ -174,9 +172,14 @@
             'zip'     => 'application/zip',
         ];
 
-        public static function GetByExtension(string $ext) : ?string
+        public static function GetByExtension(string $ext) :?string
         {
-            return Arr::Get($ext, self::$mimeTypes);
+            return self::$mimeTypes[$ext] ?? null;
+        }
+
+        public static function IsSupported($ext) :bool
+        {
+            return isset(self::$mimeTypes[$ext]);
         }
 
         public static function GetList() :array
