@@ -115,7 +115,7 @@
                         else if ($match['alterGlobalVar'] ?? false) {
                             $replacement = "isset({$match['mainScopeVar']}) " .
                                            "? {$match['mainScopeVar']} " .
-                                           ": \Vxn\Helper\Arr::Get('{$match['alterGlobalVar']}', \$VXN_TPL_DATA, '$match[0]')";
+                                           ": \xobotyi\A::get(\$VXN_TPL_DATA, '{$match['alterGlobalVar']}','$match[0]')";
                         }
                         else {
                             $replacement = "isset({$match['mainScopeVar']}) " .
@@ -125,17 +125,15 @@
                     }
                     else if ($match['mainGlobalVar']) {
                         if ($match['alterScopeVar'] ?? false) {
-                            $replacement = "\Vxn\Helper\Arr::Get('{$match['mainGlobalVar']}', " .
-                                           "\$VXN_TPL_DATA, " .
+                            $replacement = "\xobotyi\A::get(\$VXN_TPL_DATA, '{$match['mainGlobalVar']}', " .
                                            "isset({$match['alterScopeVar']}) ? {$match['alterScopeVar']} : '$match[0]')";
                         }
                         else if ($match['alterGlobalVar'] ?? false) {
-                            $replacement = "\Vxn\Helper\Arr::Get('{$match['mainGlobalVar']}', " .
-                                           "\$VXN_TPL_DATA, " .
-                                           "\Vxn\Helper\Arr::Get('{$match['alterGlobalVar']}', \$VXN_TPL_DATA, '$match[0]'))";
+                            $replacement = "\xobotyi\A::get(\$VXN_TPL_DATA, '{$match['mainGlobalVar']}', " .
+                                           "\xobotyi\A::get(\$VXN_TPL_DATA, '{$match['alterGlobalVar']}','$match[0]'))";
                         }
                         else {
-                            $replacement = "\Vxn\Helper\Arr::Get('{$match['mainGlobalVar']}', \$VXN_TPL_DATA, '$match[0]')";
+                            $replacement = "\xobotyi\A::get(\$VXN_TPL_DATA, '{$match['mainGlobalVar']}', '$match[0]')";
                         }
                     }
                     else if ($match['mainLiteralVar']) {

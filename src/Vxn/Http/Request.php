@@ -6,6 +6,7 @@
     namespace Vxn\Http;
 
     use Vxn\Core\FS;
+    use xobotyi\A;
 
     final class Request
     {
@@ -16,7 +17,7 @@
         private static $dataRaw   = [];
         private static $dataRawCI = [];
 
-        private static $dataEncoded   = [];
+        private static $dataDecoded   = [];
         private static $dataEncodedCI = [];
 
         private static $dataSafe = [];
@@ -58,11 +59,11 @@
             self::$uriData['pathArr'] = explode('/', trim(self::$uriData['path'], '/'));
 
             // Encoded data fill
-            self::$dataEncoded['get']     = $_GET;
-            self::$dataEncoded['post']    = $_POST;
-            self::$dataEncoded['request'] = array_replace(self::$dataEncoded['get'], self::$dataEncoded['post']);
-            self::$dataEncoded['server']  = $_SERVER;
-            self::$dataEncoded['cookie']  = $_COOKIE;
+            self::$dataDecoded['get']     = $_GET;
+            self::$dataDecoded['post']    = $_POST;
+            self::$dataDecoded['request'] = array_replace(self::$dataDecoded['get'], self::$dataDecoded['post']);
+            self::$dataDecoded['server']  = $_SERVER;
+            self::$dataDecoded['cookie']  = $_COOKIE;
 
             // Raw data fill
             self::$dataRaw['get'] =
@@ -71,9 +72,9 @@
             self::$dataRaw['server'] =
             self::$dataRaw['cookie'] = [];
 
-            foreach (self::$dataEncoded['server'] as $key => &$value) {
+            foreach (self::$dataDecoded['server'] as $key => &$value) {
                 if (substr($key, 0, 5) == 'HTTP_') {
-                    self::$dataEncoded['headers'][substr($key, 5)] = &$value;
+                    self::$dataDecoded['headers'][substr($key, 5)] = &$value;
                 }
             }
 
@@ -88,45 +89,12 @@
 
             self::$dataRaw['request'] = array_merge(self::$dataRaw['get'], self::$dataRaw['post']);
 
-            if (preg_match_all('/(\b[^;=]+)=([^;]+)?/i', self::$dataEncoded['server']['HTTP_COOKIE'] ?? '', self::$dataRaw['cookie'])) {
+            if (preg_match_all('/(\b[^;=]+)=([^;]+)?/i', self::$dataDecoded['server']['HTTP_COOKIE'] ?? '', self::$dataRaw['cookie'])) {
                 self::$dataRaw['cookie'] = array_combine(self::$dataRaw['cookie'][1], self::$dataRaw['cookie'][2]);
             }
 
-            // Case insensitive data fill;
-            self::$dataEncodedCI['headers'] =
-            self::$dataEncodedCI['get'] =
-            self::$dataEncodedCI['post'] =
-            self::$dataEncodedCI['request'] =
-            self::$dataEncodedCI['server'] =
-            self::$dataEncodedCI['cookie'] = [];
-
-            self::$dataRawCI['get'] =
-            self::$dataRawCI['post'] =
-            self::$dataRawCI['request'] =
-            self::$dataRawCI['server'] =
-            self::$dataRawCI['cookie'] = [];
-
-            $crawler = function (array &$array, array &$result) use (&$crawler) {
-                foreach ($array as $key => &$value) {
-                    $keyLower = strtolower($key);
-
-                    if (is_array($value)) {
-                        $result[$keyLower] = [];
-                        $crawler($value, $result[$keyLower]);
-                    }
-                    else {
-                        $result[$keyLower] = &$value;
-                    }
-                }
-            };
-
-            foreach (self::$dataRaw as $key => &$item) {
-                $crawler($item, self::$dataRawCI[$key]);
-            }
-
-            foreach (self::$dataEncoded as $key => &$item) {
-                $crawler($item, self::$dataEncodedCI[$key]);
-            }
+            self::$dataRawCI     = A::changeKeyCase(self::$dataRaw, CASE_LOWER, true);
+            self::$dataEncodedCI = A::changeKeyCase(self::$dataDecoded, CASE_LOWER, true);
         }
 
         public static function IsPostMethod() :bool
@@ -140,7 +108,7 @@
         {
             self::Init();
 
-            return strtoupper(self::$dataEncoded['server']['REQUEST_METHOD'] ?? 'GET');
+            return strtoupper(self::$dataDecoded['server']['REQUEST_METHOD'] ?? 'GET');
         }
 
         public static function Get(?string $name = null, $default = null, bool $caseInsensitive = false, bool $raw = false)
@@ -151,7 +119,7 @@
                 return ($raw ? self::$dataRawCI['get'] : self::$dataEncodedCI['get'])[$name] ?? $default;
             }
             else {
-                return ($raw ? self::$dataRaw['get'] : self::$dataEncoded['get'])[$name] ?? $default;
+                return ($raw ? self::$dataRaw['get'] : self::$dataDecoded['get'])[$name] ?? $default;
             }
         }
 
@@ -170,7 +138,7 @@
                 return ($raw ? self::$dataRawCI['post'] : self::$dataEncodedCI['post'])[$name] ?? $default;
             }
             else {
-                return ($raw ? self::$dataRaw['post'] : self::$dataEncoded['post'])[$name] ?? $default;
+                return ($raw ? self::$dataRaw['post'] : self::$dataDecoded['post'])[$name] ?? $default;
             }
         }
 
@@ -189,7 +157,7 @@
                 return ($raw ? self::$dataRawCI['request'] : self::$dataEncodedCI['request'])[$name] ?? $default;
             }
             else {
-                return ($raw ? self::$dataRaw['request'] : self::$dataEncoded['request'])[$name] ?? $default;
+                return ($raw ? self::$dataRaw['request'] : self::$dataDecoded['request'])[$name] ?? $default;
             }
         }
 
@@ -209,7 +177,7 @@
                 return ($raw ? self::$dataRawCI['server'] : self::$dataEncodedCI['server'])[$name] ?? $default;
             }
             else {
-                return ($raw ? self::$dataRaw['server'] : self::$dataEncoded['server'])[$name] ?? $default;
+                return ($raw ? self::$dataRaw['server'] : self::$dataDecoded['server'])[$name] ?? $default;
             }
         }
 
@@ -229,7 +197,7 @@
                 return ($raw ? self::$dataRawCI['cookie'] : self::$dataEncodedCI['cookie'])[$name] ?? $default;
             }
             else {
-                return ($raw ? self::$dataRaw['cookie'] : self::$dataEncoded['cookie'])[$name] ?? $default;
+                return ($raw ? self::$dataRaw['cookie'] : self::$dataDecoded['cookie'])[$name] ?? $default;
             }
         }
 
@@ -244,7 +212,7 @@
         {
             self::Init();
 
-            return ($caseInsensitive ? self::$dataEncodedCI['headers'] : self::$dataEncoded['headers'])[$name] ?? $default;
+            return ($caseInsensitive ? self::$dataEncodedCI['headers'] : self::$dataDecoded['headers'])[$name] ?? $default;
         }
 
         public static function Body() :string
