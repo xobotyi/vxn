@@ -8,28 +8,28 @@
     final class HttpStatusCode
     {
         // 2xx Success
-        public const STATUS_200 = '200';
-        public const STATUS_201 = '201';
-        public const STATUS_202 = '202';
-        public const STATUS_204 = '204';
+        public const STATUS_200 = 200;
+        public const STATUS_201 = 201;
+        public const STATUS_202 = 202;
+        public const STATUS_204 = 204;
 
         // 3xx Redirection
-        public const STATUS_301 = '301';
-        public const STATUS_302 = '302';
-        public const STATUS_303 = '303';
-        public const STATUS_304 = '304';
-        public const STATUS_307 = '307';
+        public const STATUS_301 = 301;
+        public const STATUS_302 = 302;
+        public const STATUS_303 = 303;
+        public const STATUS_304 = 304;
+        public const STATUS_307 = 307;
 
         // 4xx Client errors
-        public const STATUS_400 = '400';
-        public const STATUS_401 = '401';
-        public const STATUS_403 = '403';
-        public const STATUS_404 = '404';
-        public const STATUS_410 = '410';
+        public const STATUS_400 = 400;
+        public const STATUS_401 = 401;
+        public const STATUS_403 = 403;
+        public const STATUS_404 = 404;
+        public const STATUS_410 = 410;
 
         // 5xx Server errors
-        public const STATUS_500 = '500';
-        public const STATUS_503 = '503';
+        public const STATUS_500 = 500;
+        public const STATUS_503 = 503;
 
         private static $statusList = [
             self::STATUS_200,
