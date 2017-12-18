@@ -8,9 +8,9 @@
 
     class Base64 implements EncoderInterface
     {
-        public static function encode($var, bool $urlUnsafe = false) :string
+        public static function encode($var, bool $urlSafe = true) :string
         {
-            return $urlUnsafe ? base64_encode($var) : strtr(base64_encode($var), '+/=', '-_~');
+            return $urlSafe ? strtr(base64_encode($var), '+/=', '-_~') : base64_encode($var);
         }
 
         public static function decode(string $var)
