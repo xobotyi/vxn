@@ -8,7 +8,7 @@
 
     class Base64 implements EncoderInterface
     {
-        public static function encode($var, bool $urlSafe = true) :string
+        public static function encode($var, bool $urlSafe = false) :string
         {
             return $urlSafe ? strtr(base64_encode($var), '+/=', '-_~') : base64_encode($var);
         }
