@@ -73,7 +73,9 @@
             }
 
             if (self::CallModuleAction($moduleNS, $endpoint['action'], $endpoint['parameters'], $endpoint['data'])) {
-                Middleware::FireAlias($endpoint['middleware'], Middleware::STAGE_POST);
+                if (!empty($endpoint['middleware'])) {
+                    Middleware::FireAlias($endpoint['middleware'], Middleware::STAGE_POST);
+                }
 
                 return true;
             }

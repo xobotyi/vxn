@@ -90,13 +90,18 @@
             return true;
         }
 
-        public static function FireAlias(string $aliasName, string $stage)
+        public static function FireAlias($aliasName, string $stage)
         {
-            $aliasName = explode(' ', trim($aliasName));
+            if (is_string($aliasName)) {
+                $aliasName = explode(' ', trim($aliasName));
+            }
+            else if (!is_array($aliasName)) {
+                throw new \Error("Parameter 1 expected to be string or array of string, got " . gettype($aliasName));
+            }
 
             foreach ($aliasName as $name) {
                 if (!self::$alias[$name]) {
-                    throw new \TypeError("Unknown middleware alias '{$name}'");
+                    throw new \Error("Unknown middleware alias '{$name}'");
                 }
 
                 if (self::$alias[$name][$stage]) {
