@@ -34,7 +34,7 @@
             return function_exists('\curl_init()');
         }
 
-        public static function POST(string $uri, $data, array $options = []) :array
+        public static function POST(string $uri, $data, array $headers = [], array $options = []) :array
         {
             self::Init();
 
@@ -47,6 +47,13 @@
             $options[CURLOPT_HEADER]         = 1;
             $options[CURLOPT_FOLLOWLOCATION] = 1;
             $options[CURLOPT_POST]           = 1;
+
+            if (!empty($headers)) {
+                $options[CURLOPT_HTTPHEADER] = [];
+                foreach ($headers as $header => &$value) {
+                    $options[CURLOPT_HTTPHEADER][] = $header . ': ' . $value;
+                }
+            }
 
             if (!empty($data)) {
                 if (is_array($data)) {
@@ -72,7 +79,7 @@
             ];
         }
 
-        public static function GET(string $uri, array $options = [])
+        public static function GET(string $uri, array $headers = [], array $options = [])
         {
             self::Init();
 
@@ -84,6 +91,13 @@
             $options[CURLOPT_VERBOSE]        = 1;
             $options[CURLOPT_HEADER]         = 1;
             $options[CURLOPT_FOLLOWLOCATION] = 1;
+
+            if (!empty($headers)) {
+                $options[CURLOPT_HTTPHEADER] = [];
+                foreach ($headers as $header => &$value) {
+                    $options[CURLOPT_HTTPHEADER][] = $header . ': ' . $value;
+                }
+            }
 
             curl_setopt_array($curl, array_merge(self::$defaultOptions, $options));
 
