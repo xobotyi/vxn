@@ -74,8 +74,8 @@
 
             return [
                 'status'  => curl_getinfo($curl, CURLINFO_HTTP_CODE),
-                'headers' => substr($result, 0, $headersSize),
-                'body'    => substr($result, $headersSize),
+                'headers' => $result ? substr($result, 0, $headersSize) : '',
+                'body'    => $result ? substr($result, $headersSize) : '',
             ];
         }
 
@@ -106,8 +106,8 @@
 
             return [
                 'status'  => curl_getinfo($curl, CURLINFO_HTTP_CODE),
-                'headers' => substr($result, 0, $headersSize),
-                'body'    => substr($result, $headersSize),
+                'headers' => $result ? substr($result, 0, $headersSize) : '',
+                'body'    => $result ? substr($result, $headersSize) : '',
             ];
         }
     }
